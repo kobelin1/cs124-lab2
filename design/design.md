@@ -40,7 +40,6 @@ The final alternative design choice we had considered was having the header bord
 We ran some user testing on our friends who are not currently in the class and have not taken it before. 
 
 We found that in general, they understood what actions could be done, such as how to add new items and how to mark items as completed. However, one action that seemed to bring about some confusion was in regards to renaming list items. When User A was trying to rename a list item, they said the first thing they would do is double-click the list item. Afterwards, they realized that there is specifically a "Rename" button in order to it. From there, they were also confused what to do after they finished renaming an item. Their first thought was to click out of the text box, then again they realized after that the rename button changed to a "Done" button in order to finish renaming. One potential cause for this confusion is because we ran the user tests on a computer. As such, one a computer it would seem intuitive to double-click to start renaming. If we were to run the user test on mobile, we predict that this issue would likely not occur. 
-- havent done user testing yet, but Roman and I plan to eventually
 
 ## Challenges Faced
 

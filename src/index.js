@@ -3,10 +3,29 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import {generateUniqueID} from "web-vitals/dist/modules/lib/generateUniqueID";
+
+const data = [
+    {
+        id : generateUniqueID(),
+        name: "Test Item",
+        checked: false
+    },
+    {
+        id: generateUniqueID(),
+        name: "Second Test Item",
+        checked: true
+    }
+
+]
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+      <div>
+          {data[0].id}
+          <br />
+          {data[1].id}
+      </div>
   </React.StrictMode>,
   document.getElementById('root')
 );

@@ -15,32 +15,43 @@ const data = [
         id: generateUniqueID(),
         name: "Second Test Item",
         value: "Second Test Item",
-        text: "Some text",
-        checked: true
+        text: "Second Some text",
+        checked: false
     }
 ]
-
 
 function App() {
     const [listItems, setListItems] = useState(data)
     const [selectedItems, setSelectedItems] = useState([])
     // const []
-
+    console.log("selectedItems: ", selectedItems)
 
     function TaskList(){
         return(<div>
                 {listItems.map((item) => <Item id={item.id} name={item.name} value={item.value} text={item.text}/>)}
-                <button type="button" id="item_button" name="item_button">Create new item +</button>
+                {/*<button type="button" id="item_button" name="item_button">Create new item +</button>*/}
+                <button type={"button"} id="item_button" name="item_button" onClick={handleAddItemClick}>Create New Item</button>
+                <button type="button" id="delete_button" name="delete_button" onClick={handleDeleteClick}>Delete All Completed</button>
             </div>
         );
     }
 
     function handleAddItemClick(){
-
+        console.log("add item click")
+        setListItems([...listItems,
+            {
+                id: generateUniqueID(),
+                name: "name",
+                value: "value",
+                text: generateUniqueID(),
+                checked: false
+            }]);
     }
 
     function handleDeleteClick(){
-
+        setListItems(listItems.filter(i => !selectedItems.includes(i.id)));
+        setSelectedItems([]);
+        console.log(selectedItems);
     }
 
     function handleRenameClick(){
@@ -51,11 +62,16 @@ function App() {
 
     }
 
-    function handleToggleItemSelect(item){
-        if (selectedItems.includes(item.id)) {
-            setSelectedItems(selectedItems.filter(i => i !== item.id));
+    function handleToggleItemSelect(itemId, itemText){
+        console.log(itemText)
+        if (selectedItems.includes(itemId)) {
+            setSelectedItems(selectedItems.filter(i => i !== itemId));
+            // let localSelectedOne = selectedItems;
+            // console.log("selected after toggle: ", localSelectedOne);
         } else {
-            setSelectedItems([...selectedItems, item.id]);
+            setSelectedItems([...selectedItems, itemId]);
+            // let localSelectedTwo = selectedItems;
+            // console.log("selected after toggle: ", localSelectedTwo);
         }
     }
 

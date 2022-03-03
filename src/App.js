@@ -74,8 +74,8 @@ function App() {
 
     function Item(props){
         return (<span>
-            <input type="checkbox" id={props.id} name={props.name} value={props.value} className="bigCheckbox" onClick={handleToggleItemSelect} />
-            <label htmlFor={props.id}>props.text</label><br/><br/>
+            <input type="checkbox" id={props.id} name={props.name} value={props.value} className="bigCheckbox" onClick={() => handleToggleItemSelect(props.id, props.text)} />
+            <label htmlFor={props.id}>{props.text}</label><br/><br/>
             </span>
         );
     }
@@ -85,6 +85,7 @@ function App() {
       <div className="title_card">
           <h2>Your TODO List</h2>
       </div>
+        {TaskList()}
     </div>
 
     );

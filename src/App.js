@@ -28,10 +28,17 @@ function App() {
 
     function TaskList(){
         return(<div>
-                {listItems.map((item) => <Item id={item.id} name={item.name} value={item.value} text={item.text}/>)}
+                {/*<table>*/}
+                {/*    <tbody>*/}
+                        {listItems.map((item) => <Item id={item.id} name={item.name} value={item.value} text={item.text}/>)}
+                {/*    </tbody>*/}
+                {/*</table>*/}
                 {/*<button type="button" id="item_button" name="item_button">Create new item +</button>*/}
                 <button type={"button"} id="item_button" name="item_button" onClick={handleAddItemClick}>Create New Item</button>
-                <button type="button" id="delete_button" name="delete_button" onClick={handleDeleteClick}>Delete All Completed</button>
+                {selectedItems.length > 0 &&
+                    <button type={"button"} onClick={handleDeleteClick}>Delete Selected</button>}
+                {listItems.length > 0 &&
+                    <button type={"button"}>Rename Items</button>}
             </div>
         );
     }
@@ -54,8 +61,10 @@ function App() {
         console.log(selectedItems);
     }
 
-    function handleRenameClick(){
+    function handleRenameClick(listId, field, value){
 
+        setListItems(listItems.map(
+            i => i.id === listId ? {...i, [field]: value} : i))
     }
 
     function handleShowClick(){

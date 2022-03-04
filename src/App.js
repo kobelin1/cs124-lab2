@@ -41,7 +41,7 @@ function App() {
 
             {!renaming ? (hideCompleted ? listItems.map((item) => (item.checked === false) && <Item id={item.id} key={item.id} name={item.name} value={item.value} checked={item.checked} text={item.text}/>) : listItems.map((item) => <Item id={item.id} name={item.name} value={item.value} checked={item.checked} text={item.text}/>)) : false}
             {!addingItem && !renaming && <button type={"button"} id="item_button" name="item_button" onClick={() => setAddingItem(true)}>Create New Item +</button>}
-            {renaming && textBoxList.map((item) => <span><input type="text" id={item.id} name={item.id} value={item.text} onChange={e => setTextBoxList(textBoxList.map(item => item.id === e.target.id ? item.text = e.target.value: false))}/><br/></span>)}
+            {renaming && textBoxList.map((item) => <span><input type="text" className={"addedText"} id={item.id} name={item.id} value={item.text} onChange={e => handleRenaming(e)}/><br/></span>)}
 
                 {/*<button type="button" id="item_button" name="item_button">Create new item +</button>*/}
                 {/*{selectedItems.length > 0 &&*/}
@@ -61,6 +61,11 @@ function App() {
             <input type="text" id="item_enter" name="item_enter" value={curText} onChange={event => {setCurText(curText + event)}}/>
             <button type="button" id="add_item" name="add_item" onClick={handleNewItem}>Add</button>
         </span>);
+    }
+
+    function handleRenaming(e){
+        // textBoxList.map(item => item.id === e.target.id ? {...item, ["text"] = e.target.value} :  item)
+        setTextBoxList(textBoxList.map(item => item.id === e.target.id ? {id: e.target.id, text: e.target.value} : item))
     }
 
     function handleNewItem(){
@@ -84,7 +89,6 @@ function App() {
     }
 
     function handleRenameClick(listId, field, value){
-
         setListItems(listItems.map(
             i => i.id === listId ? {...i, [field]: value} : i))
     }
@@ -97,7 +101,19 @@ function App() {
     }
 
     function handleEndRenaming(){
+        let newList = [];
 
+        console.log(textBoxList)
+        for (let i = 0; i < listItems.length; i++){
+            console.log(textBoxList[i].text)
+            newList.push({...listItems[i], ["text"]: textBoxList[i].text})
+        }
+
+        // listItems.map(item => true ? {...item, ["text"]: textBoxList[counter].text} : false)
+        //
+        // const nah = listItems.map(lItem => textBoxList.map(tItem => lItem.id === tItem.id ? {...lItem, ["text"]: tItem.text} : lItem))
+        setListItems(newList)
+        setRenaming(false)
     }
 
 
@@ -119,8 +135,8 @@ function App() {
         return (<div className="list">
                 <br />
 
-                {!addingItem && !renaming && listItems.length > 0 && <button type="button" id="rename_button" name="rename_button" onClick={() => handleStartRenaming}>Rename</button>}
-                {!addingItem && renaming && listItems.length > 0 && <button type="button" id="rename_button" name="rename_button" onClick={() => handleEndRenaming}>Finish Renaming</button>}
+                {!addingItem && !renaming && listItems.length > 0 && <button type="button" id="rename_button" name="rename_button" onClick={handleStartRenaming}>Rename</button>}
+                {!addingItem && renaming && listItems.length > 0 && <button type="button" id="rename_button" name="rename_button" onClick={handleEndRenaming}>Finish Renaming</button>}
 
                 {(!hideCompleted && !renaming && listItems.length > 0 && !addingItem)  && <button type="button" id="show_uncompleted_button" name="show_uncompleted_button" onClick={() => setHideCompleted(true)}>Hide Completed</button>}
                 {(hideCompleted && !renaming && listItems.length > 0 && !addingItem) && <button type="button" id="show_uncompleted_button" name="show_uncompleted_button" onClick={() => setHideCompleted(false)}>Show All Items</button>}

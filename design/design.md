@@ -1,54 +1,75 @@
 
-# CS124 Lab 1 Design Document
+# CS124 Lab 2 Design Document
 #### Team Members: Roman Herrera and Kobe Lin
 
 
 ## Design Decisions
-One of the first design decisions that we made was to make the page itself look similar to a notepad. This was to make using the webpage to be analagous to writing to-do notes down on paper. We chose colors typical to most notepads in order to mirror this decision. Another way we implemented this idea was by having the actual body of the to-do list be left-justified, reflecting the convention of English to be written and read from left-to-right. If we were to implement this for languages read and written from right-to-left, we would have instead made our items be right-justified. In fact, we decided to have the items on our page be left-aligned in general, as that is where users will likely scan their eyes first. Furthermore, we felt that to-do lists should be very clean and easy to look at, so we chose to have the general look of the webpage be very minimal so as not to feel too distracting for the user. 
+When starting this lab, we had to decide whether or keep our designs from last time or to try to make some larger design changes. For the sake of simplicity and because we liked our design, we continued to use the overall style of the original design we created. Our main goal was still to have a very simple overall look to mimic a real life notepad. However, we made noticeable edits based on feedback we received. For the same reasons as before with the earlier design, we had the list be left-justified. 
 
-![lab1base1.png](https://www.dropbox.com/s/86qqvf1ja9krs9u/lab1base1.png?dl=0&raw=1)
+![homepage.png](https://www.dropbox.com/s/lwgmhsyzd6ifbri/homepage.png?dl=0&raw=1)
 
-Another decision we made was about buttons. 
-- In regards to placement, we felt that it would make the most sense to have the "Create new item" button be right underneath the list itself, and have newly added items appear right above it. As for the "Rename", "Show Uncompleted", and "Delete All Completed" buttons, we decided to have it grouped together at the bottom of the page as they each can affect multiple list items at once, and thus have somewhat similar functionality. 
-- We also decided that when a button is "in use", the buttons would stay in the same place but have their text modified to show that an action is tak  ing place (for ex. the Rename button changes its text to "Done" upon click, and back to "Rename" once the user clicks it again).
+Some new design choices we made though were small wording changes, such as the old “Show Uncompleted” to “Hide Uncompleted” as it is makes the button’s function more intuitive. We also switched the “Rename” button to be called “Edit Items” as various users found the name of the button to be confusing, since the list items are not really names. Furthermore, we changed the “Delete All Completed” functionality to “Delete Selected” to give users more freedom to delete what they wish from the list. We also chose to have all other buttons disappear now when clicking “Create a new list +”, “Edit Items”, or “Delete Selected”. This was to force the user to interact with the intermediate step of the process without being able to press other buttons. For example, if you were to press “Edit Items”, the button would change to “Finish Editing,” and all other buttons would disappear so the focus is entirely on the text boxes to made edits with and the “Finish Editing” button. 
 
-![lab1renaming1.png](https://www.dropbox.com/s/pc7jkufqhezqvkk/lab1renaming1.png?dl=0&raw=1)
-
+Also based on user testing, we found that having the option to do other things during these intermediate steps made them feel like nothing happens with their button click since the button name change would be subtle. We also chose to place the important functionality buttons at the top instead of underneath the list as before. It was noted to us that it could become problematic if too many tasks were created. Furthermore, it is more difficult to see, and therefore more difficult for the user to know immediately what they can do. In similar spirit as before, these three button are grouped together due to their similar scope of functionality over the entire list. However, we kept the “Create new item +” button under the list because it makes sense that a new item would be formed at the bottom of the list, so users would look there to create the new item. Additionally, it does not have the same scope as the other buttons, so it could become confusing to have it paired with them.
 
 ## Alternative Designs
+A lot of the alternate designs we considered were similar to prior. 
 
-When designing our webpage, there were 4 alternative designs that we considered.
+##### 1. Button layout
+![callmom_pre.png](https://www.dropbox.com/s/ubdwwwkvjczfark/callmom_pre.png?dl=0&raw=1)
 
-##### 1. Putting the rename/show uncompleted/delete all completed buttons in the top right
-![alttopright.jpg](https://www.dropbox.com/s/4b1v6jszsq0rvei/alttopright.jpg?dl=0&raw=1)
-One of our initial considerations was potentially putting these buttons in the top right of the page. However, we decided against this because we felt that it would be better for the body of the to-do list to be the first thing under the header. We would rather the user's attention to immediately be locked onto their to-do list rather than the functionality buttons. 
+The button layout was a notable decision, as we still considered our original layout above as an alternate design. However, as noted above, we found that having the important, all encompassing buttons at the top in a static location would make the most sense.
 
-##### 2. Making the add button a "+" instead of the word "Add"
-![altplus.jpg](https://www.dropbox.com/s/2l2xx30okl0bgno/altplus.jpg?dl=0&raw=1)
-Our second consideration was having the add item button have a plus sign on it, instead of the word "Add" which we went with. This is because we felt it would be more clear with the word "Add" that clicking it would directly add the new item into the to-do list. We were worried there would be some confusion surrounding what action exactly would happen if we had the plus sign instead. One potential interpretation could have been that the plus sign would add another new item textbox instead of adding the current new item to the list.
+##### 2. Popup alert
 
-##### 3. Having a rename button on each list item
-![altrename.jpg](https://www.dropbox.com/s/q9nhnpyf69pblsb/altrename.jpg?dl=0&raw=1)
-The third alternative design option that we considered was having a rename button on each list item. The way we have it now is one rename button that, when clicked, turns all list items into text boxes and allows the user to rename whichever ones they want. The option we considered was having a rename button right next to each individual list item (and thus, would allow the user to rename one item at a time). We decided against this as we felt having too many buttons would make the webpage look cluttered and messy.
+![IMG_0279.jpg](https://www.dropbox.com/s/8d332twxoq119m1/IMG_0279.jpg?dl=0&raw=1)
 
-##### 4. Make the header flush to the edge of the page
-![altflush.jpg](https://www.dropbox.com/s/trn7ja6w4r7iosm/altflush.jpg?dl=0&raw=1)
-The final alternative design choice we had considered was having the header border be flush to the edge of the page. Truthfully, this is actually a design that we wanted to go forth with. Unfortunately, we were unable to work with our webpage to make it look exactly as we wanted to. As such, we decided against it, and went forth with our current design. If we were able to create this properly, we would likely have chosen this alternative design. 
+We also considered a pop-up alert when the delete button is pressed, rather than our implementation where every other functional button disappears except the new confirm deletion button and cancel button. We actually consider this alternate design to be superior to our current implementation, as it truly prevents the user from making any other changes and is attention grabbing. However, we were faced with time constraints so we focused on creating a simpler, but less elegant solution. 
+
+##### 3. Editing items
+![IMG_0281.jpg](https://www.dropbox.com/s/litdf644smzlmms/IMG_0281.jpg?dl=0&raw=1)
+There was also discussion about making editing item individualized. We found that having multiple items all editable at once, and saving all of it at once was a pain to implement. The implementation was bug-ridden and was not simple at all. Changing to only one edit would be a simpler solution and was one suggested by a user during test. They said that the concept of an “Edit Text” was non-intuitive and that we should allow for double-click instead. We kept with our design though because double-clicking on a mobile app is non-intuitive and without instructions, would not be abundantly clear. We felt that a singular button to control editing is more self-explanatory, and since users have to scroll with their fingers, we do not want a single touch to constantly bring up editing fields as they scroll.
 
 ## User Testing
+We performed some user testing at two stages of the process. We again ran it on our friends who are not currently in the class and have not taken it before. 
 
-We ran some user testing on our friends who are not currently in the class and have not taken it before. 
+In the first round of testing, most users understood all of the actions. Similar to last time, they understood the basic actions and did not expect more from the app than what was provided. They understood how to add items and how to mark the items as completed. However, many noted how buttons clicks on processes with multiple steps felt like nothing happened and were unintuitive. Notably, they found that they could continue pressing other buttons, and performing other actions, even if they had to still confirm the delete for instance. Like last time, there was the same user who was confused about the “Edit Items” button. When the user was trying to edit the list, they were trying to double-click the item like last time. Eventually, they resorted to the “Edit Items” button, but found the whole process unintuitive for a task manager. However, other users did not find this to be an issue, and as described earlier, we wanted to maintain the use of a button rather than double-clicking, especially since the application was deigned for mobile. Another notable problem pointed out by a few users was that when deleting items, they could not cancel their deletion, which was a huge oversight on our part.
 
-We found that in general, they understood what actions could be done, such as how to add new items and how to mark items as completed. However, one action that seemed to bring about some confusion was in regards to renaming list items. When User A was trying to rename a list item, they said the first thing they would do is double-click the list item. Afterwards, they realized that there is specifically a "Rename" button in order to it. From there, they were also confused what to do after they finished renaming an item. Their first thought was to click out of the text box, then again they realized after that the rename button changed to a "Done" button in order to finish renaming. One potential cause for this confusion is because we ran the user tests on a computer. As such, one a computer it would seem intuitive to double-click to start renaming. If we were to run the user test on mobile, we predict that this issue would likely not occur. 
+## Final Design
+![homepage.png](https://www.dropbox.com/s/lwgmhsyzd6ifbri/homepage.png?dl=0&raw=1)
+
+Our final design is shown in the image above. We decided to have three "functionality" buttons at the top ("Edit Items", "Hide Completed", and "Delete Selected"), put the body of the list at the center, and a button to create new items underneath the list body. A flow for each of the functionalities would be as follows:
+
+##### 1. Edit Items
+When the user first clicks on the "Edit Items" button, a new page will be brought up where each of the items becomes an editable text box. 
+
+![editingpre.png](https://www.dropbox.com/s/3lvci779r5u8eub/editingpre.png?dl=0&raw=1)
+
+In the example above, a user may choose to change the first list item from "Call Mom" to "Call Dad". Clicking the "Finish Editing" button will bring the user back to the initial page, as seen in the image below.
+
+![editingpost.png](https://www.dropbox.com/s/im9b12rt5re52gk/editingpost.png?dl=0&raw=1)
+
+##### 2. Hide Completed
+![hidecompleted.png](https://www.dropbox.com/s/0j48mfglyulfnpb/hidecompleted.png?dl=0&raw=1)
+
+If the user has any completed items, clicking the "Hide Completed" button will remove the completed item from the screen. Furthemore, the "Hide Completed" button's text will be changed into "Show All Items". Clicking this button will bring back the completed items, and change the button's text back to "Hide Completed".
+
+##### 3. Delete Selected
+
+If the user has any completed items, the "Delete Selected" button will appear. Clicking this button will bring up a new page, where all the functionality buttons disappear and are replaced with a "Confirm Deletions" button and a "Cancel" button
+
+![confirmdeletepre.png](https://www.dropbox.com/s/0133r09dvtgs3b4/confirmdeletepre.png?dl=0&raw=1)
+
+The "Confirm Deletions" button will delete any completed tasks the user may have. The "Cancel" button will back the user out of the confirmation screen and back to the initial page with no changes made.
+
+![confirmdeletepost.png](https://www.dropbox.com/s/9wqxbh6qxmpy93b/confirmdeletepost.png?dl=0&raw=1)
+
+Once the user does confirm their deletion, they will be returned back to the intial page, and the "Delete Selected" button will no longer be visible.
 
 ## Challenges Faced
 
-One alternative design we wanted to implement was having the entire header be one color, with no padding on either side of it, as this more accurately represents real notepads. However, this ended up being our greatest challenge. No matter what we tried, the padding either was removed everywhere from the document, or no where at all. We did not want the body to lose the padding and margin since characters would start bleeding over the edge, and overall it would not look clean. After attempting to get this to work, we decided this extra little detail was not worth the challenge it was presenting. 
-
-The arrangement of the elements on the page was also a major issue. We considered multiple layouts for the functional buttons, and to arrange everything, we used a grid box. We thought that this was be a relatively straight forward task. However, the buttons proved to be tricky to position exactly how we wanted. They filled up the entire grid cell given to them, or overlapped with each other. We wanted them to all be aligned so naturally they had to be together, but we could not easily get them to align horizontally the way we wanted them to. Even when separating them into their own columns, we still had issues with sizing, text overflowing out of the box, and again, not being aligned. Most of these issues came from when we were trying to make the buttons exist on the top right of the page. However, when we decided to swap to under the list, we experienced less challenges making the buttons format.
+We faced many significant challenges in the portion of the design process. One major issue was the styling, as our .css file from before was not formatting things correctly. Buttons were not formatting to the top, font sizes were all over the place, and text boxes were appearing all across the screen. It was a disaster in terms of simplicity and intuitive use, so we had to spend a significant amount of time fixing the .css to make the whole experience significantly better for the users. Another major challenge we faced was the editing items function. Since our list items are checkboxes, their value is not editable. Therefore, we had to figure out how to “convert” everything into a text box to receive edits, then using those edits, change the current values in the list of items, and re-render the checkboxes again. Dealing with this amount of changes proved difficult to implement. Many of times, objects would suddenly become undefined and then all of the check boxes would suddenly have no text values. Eventually we got it to work using numerous states, loops, and helper functions. Another struggle was implementing the “Hide completed” and “Show all buttons”. We anticipated this part to be an easier implementation but as we worked through it, we discovered that the current way we were implementing our selection was poor and was not helpful (having separate states for everything rather than using an attribute of the items). Because of it, we chose to redo parts of our implementation to make decisions further down easier. So while the buttons were not a major struggle to create, they showed significant flaws with our approach and forced us to redo parts of our implementation. 
 
 ## Designs Most Proud Of
 
-We feel most proud of our designs that were made with awareness that this is a mobile web page and that it is meant to be productive for the user. We are proud of the design with the rename button, such that it can used for everything at once. Originally, we thought it would be easier to have an implicit rename, such as by double tapping the word. However, for the mobile experience, double clicking is not be an obvious function. Therefore, we knew that we needed a button for renaming. However, we also thought that a rename button for every list element would be tacky and distracting. The idea that the button can be a sort of “one-stop-shop” was an interesting idea and so we decided to implement it. Because we feel like it accommodates the main goals of the page well, this was a clever idea and therefore we are proud of it. 
-
-We are also proud of the idea to use a checkbox for each task rather than an unordered list or ordered list. The checkbox provides a clear visual representation of whether or not the task is finished (checked or not). In other implementations, it is less obvious how to go about representing a task as finished, visually and later in the code. Even though the webpage is supposed to be lists, our lack of literal lists provides a clever way to easily capture data about that task (finished or not) while also being straightforward about how to use to mark off your task. For these reasons, we feel particularly proud of the design choice to use checkboxes instead of lists. 
+We were most proud of being able to have checkboxes and edit their text. One major concern throughout the implementation was how to convert our checkboxes into text boxes that the users can input into. Initially, it started with creating an item, where a text box appears and the user types what they want. We were proud that we found a way to use a state to keep track of the user input and generate a new checkbox to reflect their input. This was expanded on with the edit items button, as it was a similar problem but scaled up. However our approach for this had to be different, as one state was not going to cut it. We felt like our solution to this was a bit dirty, but we were just proud that we were able to get it to work after hours of debugging and getting ready to give up on the idea. Another smaller design choice we are proud of is hiding all buttons whenever a multi-step process was created. We were worried about fringe cases where users simply spam all buttons, so by hiding all of the buttons, we were able to prevent having catch these weird sequences. We are proud that we were able to force users to proceed with these steps and not cause issues by taking unorthodox sequences of actions. 

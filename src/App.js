@@ -135,8 +135,8 @@ function App() {
         return (<div className="list">
                 <br />
 
-                {!addingItem && !renaming && listItems.length > 0 && <button type="button" id="rename_button" name="rename_button" onClick={handleStartRenaming}>Rename</button>}
-                {!addingItem && renaming && listItems.length > 0 && <button type="button" id="rename_button" name="rename_button" onClick={handleEndRenaming}>Finish Renaming</button>}
+                {!addingItem && !renaming && listItems.length > 0 && <button type="button" id="rename_button" name="rename_button" onClick={handleStartRenaming}>Edit Items</button>}
+                {!addingItem && renaming && listItems.length > 0 && <button type="button" id="rename_button" name="rename_button" onClick={handleEndRenaming}>Finish Editing</button>}
 
                 {(!hideCompleted && !renaming && listItems.length > 0 && !addingItem)  && <button type="button" id="show_uncompleted_button" name="show_uncompleted_button" onClick={() => setHideCompleted(true)}>Hide Completed</button>}
                 {(hideCompleted && !renaming && listItems.length > 0 && !addingItem) && <button type="button" id="show_uncompleted_button" name="show_uncompleted_button" onClick={() => setHideCompleted(false)}>Show All Items</button>}
@@ -150,7 +150,7 @@ function App() {
     function Item(props){
         return (<span>
             <input type="checkbox" id={props.id} name={props.name} value={props.value} checked={props.checked} className="bigCheckbox" onChange={() => handleToggleItemSelect(props.id)} />
-            <label htmlFor={props.id}>{props.text}</label><br/><br/>
+                {!props.checked ? <span><label htmlFor={props.id}>{props.text}</label><br/><br/></span> : <span><label htmlFor={props.id}><s>{props.text}</s></label><br/><br/></span>}
             </span>
         );
     }

@@ -81,8 +81,21 @@ input[type="checkbox" i] {width: 30px; height: 30px;}
   width: 500px;
 }
 
+.addedText{
+  background-color: white;
+  font-family: sans-serif;
+  font-size: 15px;
+  width: 500px;
+}
+
 #item_button{
   background-color: lightgray;
+  font-size: 25px;
+  height: 35px;
+}
+
+checkbox {
+  font-size: 25px;
 }
 
 button {
@@ -92,20 +105,23 @@ button {
 
 #rename_button{
   grid-row: 2;
-  grid-column: 1;
-  height: 40px;
+  grid-column: 3;
+  font-size: 25px;
+  height: 35px;
 }
 
 #show_uncompleted_button{
   grid-row: 2;
   grid-column: 2;
-  height: 40px;
+  font-size: 25px;
+  height: 35px;
 }
 
 #delete_button{
   grid-row: 2;
   grid-column: 3;
-  height: 40px;
+  font-size: 25px;
+  height: 35px;
 }
 
 i {
@@ -113,74 +129,4 @@ i {
   font-size: 35px;
 }
 
-#diff-body {
-  background-color: white;
-  display: grid;
-  grid-template-columns: 85px 85px 85px 1fr;
-  grid-template-rows: 1fr 1fr 0.66fr 1fr 0.66fr 1fr;
-}
 
-.threeimg {
-  display: grid;
-  grid-template-columns: 380px 380px;
-  /*grid-template-rows: 1fr 1fr 1fr;*/
-}
-
-.threeimg > h2 {
-  grid-column: 1/span 3;
-  grid-row:  1;
-  font-size: 35px;
-}
-
-.threeimg > h3 {
-  grid-column: 1;
-}
-
-.threeimg > p {
-  grid-column: 2;
-}
-
-.threeimg > img {
-  grid-column: 1;
-  width: 360px;
-  height: auto;
-  border-style: solid;
-  border-color: black;
-}
-
-
-#createitem {
-  grid-row: 1;
-}
-
-#eatlunch {
-  grid-row: 2;
-}
-
-#callmom {
-  grid-row: 3;
-}
-
-#rename {
-  grid-row: 4;
-}
-
-#showuncompleted {
-  grid-row: 5;
-}
-
-#delete {
-  grid-row: 6;
-}
-
-.title_card {
-  border-style: solid;
-  border-color: black;
-  display:flex;
-  align-items: center;
-  justify-content: center;
-  background-color: sandybrown;
-  grid-row: 1;
-  grid-column: 1/span3;
-  text-align: center;
-}

@@ -36,6 +36,7 @@ function App() {
                     <button type={"button"} onClick={handleDeleteClick}>Delete Selected</button>}
                 {listItems.length > 0 &&
                     <button type={"button"}>Rename Items</button>}
+                {/*<button type={"button"} onClick={handleRenameClick}>Rename Items testing</button>*/}
             </div>
         );
     }

@@ -40,7 +40,7 @@ function App() {
         return(<div>
 
             {!renaming ? (hideCompleted ? listItems.map((item) => (item.checked === false) && <Item id={item.id} key={item.id} name={item.name} value={item.value} checked={item.checked} text={item.text}/>) : listItems.map((item) => <Item id={item.id} name={item.name} value={item.value} checked={item.checked} text={item.text}/>)) : false}
-            {!addingItem && !renaming && <button type={"button"} id="item_button" name="item_button" onClick={() => setAddingItem(true)}>Create New Item +</button>}
+            {!addingItem && areYouSure && !renaming && <button type={"button"} id="item_button" name="item_button" onClick={() => setAddingItem(true)}>Create New Item +</button>}
             {renaming && textBoxList.map((item) => <span><input type="text" className={"addedText"} id={item.id} name={item.id} value={item.text} onChange={e => handleRenaming(e)}/><br/></span>)}
 
                 {/*<button type="button" id="item_button" name="item_button">Create new item +</button>*/}
@@ -135,11 +135,11 @@ function App() {
         return (<div className="list">
                 <br />
 
-                {!addingItem && !renaming && listItems.length > 0 && <button type="button" id="rename_button" name="rename_button" onClick={handleStartRenaming}>Edit Items</button>}
-                {!addingItem && renaming && listItems.length > 0 && <button type="button" id="rename_button" name="rename_button" onClick={handleEndRenaming}>Finish Editing</button>}
+                {!addingItem && areYouSure && !renaming && listItems.length > 0 && <button type="button" id="rename_button" name="rename_button" onClick={handleStartRenaming}>Edit Items</button>}
+                {!addingItem && areYouSure && renaming && listItems.length > 0 && <button type="button" id="rename_button" name="rename_button" onClick={handleEndRenaming}>Finish Editing</button>}
 
-                {(!hideCompleted && !renaming && listItems.length > 0 && !addingItem)  && <button type="button" id="show_uncompleted_button" name="show_uncompleted_button" onClick={() => setHideCompleted(true)}>Hide Completed</button>}
-                {(hideCompleted && !renaming && listItems.length > 0 && !addingItem) && <button type="button" id="show_uncompleted_button" name="show_uncompleted_button" onClick={() => setHideCompleted(false)}>Show All Items</button>}
+                {(!hideCompleted && areYouSure && !renaming && listItems.length > 0 && !addingItem)  && <button type="button" id="show_uncompleted_button" name="show_uncompleted_button" onClick={() => setHideCompleted(true)}>Hide Completed</button>}
+                {(hideCompleted && areYouSure && !renaming && listItems.length > 0 && !addingItem) && <button type="button" id="show_uncompleted_button" name="show_uncompleted_button" onClick={() => setHideCompleted(false)}>Show All Items</button>}
 
                 {selectedItems.length > 0 && !renaming && !addingItem && areYouSure && <button type="button" id="delete_button" name="delete_button" onClick={() => setAreYouSure(false)}>Delete Selected</button>}
                 {selectedItems.length > 0 && !renaming && !addingItem && !areYouSure &&<button type="button" id="delete_button" name="delete_button" onClick={handleDeleteClick}>Confirm Deletions</button>}

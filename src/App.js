@@ -3,9 +3,10 @@ import './App.css';
 import {useState} from "react";
 import {generateUniqueID} from "web-vitals/dist/modules/lib/generateUniqueID";
 // import {useCollectionData} from "react-firebase-hooks/firestore";
-// import {initializeApp} from "firebase/app";
+// import {initializeApp} from "firebase/app";ss
 // import {collection, deleteDoc, doc, getFirestore, query, setDoc} from "firebase/firestore";
-
+// import {getFirestore} from "firebase/firestore";
+//
 // const firebaseConfig = {
 //     apiKey: "AIzaSyDKYZNUq0Pdmt0jdMMUK_OD4f1Og9R1Vm4",
 //     authDomain: "cs124-lab3-cddb4.firebaseapp.com",
@@ -14,7 +15,7 @@ import {generateUniqueID} from "web-vitals/dist/modules/lib/generateUniqueID";
 //     messagingSenderId: "696592926540",
 //     appId: "1:696592926540:web:d7a095876592d165e831e9"
 // };
-//
+
 // const firebaseApp = initializeApp(firebaseConfig);
 // const db = getFirestore(firebaseApp);
 //

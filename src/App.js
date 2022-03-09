@@ -3,6 +3,15 @@ import './App.css';
 import {useState} from "react";
 import {generateUniqueID} from "web-vitals/dist/modules/lib/generateUniqueID";
 
+const firebaseConfig = {
+    apiKey: "AIzaSyDKYZNUq0Pdmt0jdMMUK_OD4f1Og9R1Vm4",
+    authDomain: "cs124-lab3-cddb4.firebaseapp.com",
+    projectId: "cs124-lab3-cddb4",
+    storageBucket: "cs124-lab3-cddb4.appspot.com",
+    messagingSenderId: "696592926540",
+    appId: "1:696592926540:web:d7a095876592d165e831e9"
+};
+
 const data = [
     {
         id : generateUniqueID(),

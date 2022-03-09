@@ -2,15 +2,23 @@
 import './App.css';
 import {useState} from "react";
 import {generateUniqueID} from "web-vitals/dist/modules/lib/generateUniqueID";
+// import {useCollectionData} from "react-firebase-hooks/firestore";
+// import {initializeApp} from "firebase/app";
+// import {collection, deleteDoc, doc, getFirestore, query, setDoc} from "firebase/firestore";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyDKYZNUq0Pdmt0jdMMUK_OD4f1Og9R1Vm4",
-    authDomain: "cs124-lab3-cddb4.firebaseapp.com",
-    projectId: "cs124-lab3-cddb4",
-    storageBucket: "cs124-lab3-cddb4.appspot.com",
-    messagingSenderId: "696592926540",
-    appId: "1:696592926540:web:d7a095876592d165e831e9"
-};
+// const firebaseConfig = {
+//     apiKey: "AIzaSyDKYZNUq0Pdmt0jdMMUK_OD4f1Og9R1Vm4",
+//     authDomain: "cs124-lab3-cddb4.firebaseapp.com",
+//     projectId: "cs124-lab3-cddb4",
+//     storageBucket: "cs124-lab3-cddb4.appspot.com",
+//     messagingSenderId: "696592926540",
+//     appId: "1:696592926540:web:d7a095876592d165e831e9"
+// };
+//
+// const firebaseApp = initializeApp(firebaseConfig);
+// const db = getFirestore(firebaseApp);
+//
+// const collectionName = "List"
 
 const data = [
     {
@@ -45,6 +53,9 @@ function App() {
 
     const [areYouSure, setAreYouSure] = useState(true)
 
+    // const q = query(collection(db, collectionName));
+    // const [people, loading, error] = useCollectionData(q);
+
     function TaskList(){
         return(<div className={"list_body"}>
 
@@ -64,16 +75,16 @@ function App() {
         );
     }
 
-    function handleAddItemClick(){
-        console.log("add item click")
-
-        return (<span className={"item_enter"}>
-            <label htmlFor = "item_enter"> Enter new item text:</label>
-            <br/>
-            <input type="text" id="item_enter" name="item_enter" value={curText} onChange={event => {setCurText(curText + event)}}/>
-            <button type="button" id="add_item" name="add_item" onClick={handleNewItem}>Add</button>
-        </span>);
-    }
+    // function handleAddItemClick(){
+    //     console.log("add item click")
+    //
+    //     return (<span className={"item_enter"}>
+    //         <label htmlFor = "item_enter"> Enter new item text:</label>
+    //         <br/>
+    //         <input type="text" id="item_enter" name="item_enter" value={curText} onChange={event => {setCurText(curText + event)}}/>
+    //         <button type="button" id="add_item" name="add_item" onClick={handleNewItem}>Add</button>
+    //     </span>);
+    // }
 
     function handleRenaming(e){
         // textBoxList.map(item => item.id === e.target.id ? {...item, ["text"] = e.target.value} :  item)
@@ -103,10 +114,10 @@ function App() {
         setAreYouSure(true);
     }
 
-    function handleRenameClick(listId, field, value){
-        setListItems(listItems.map(
-            i => i.id === listId ? {...i, [field]: value} : i))
-    }
+    // function handleRenameClick(listId, field, value){
+    //     setListItems(listItems.map(
+    //         i => i.id === listId ? {...i, [field]: value} : i))
+    // }
 
     function handleStartRenaming(){
         setRenaming(true)
@@ -121,7 +132,7 @@ function App() {
         console.log(textBoxList)
         for (let i = 0; i < listItems.length; i++){
             console.log(textBoxList[i].text)
-            newList.push({...listItems[i], ["text"]: textBoxList[i].text})
+            // newList.push({...listItems[i], ["text"]: textBoxList[i].text})
         }
 
         // listItems.map(item => true ? {...item, ["text"]: textBoxList[counter].text} : false)
@@ -146,7 +157,7 @@ function App() {
         }
     }
 
-    function ButtonList(props){
+    function ButtonList(){
         return (<div className="list">
                 <br />
 

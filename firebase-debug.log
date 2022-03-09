@@ -1,0 +1,60 @@
+[debug] [2022-03-09T20:12:43.329Z] ----------------------------------------------------------------------
+[debug] [2022-03-09T20:12:43.330Z] Command:       /usr/local/bin/node /usr/local/bin/firebase init
+[debug] [2022-03-09T20:12:43.330Z] CLI Version:   10.2.2
+[debug] [2022-03-09T20:12:43.331Z] Platform:      darwin
+[debug] [2022-03-09T20:12:43.331Z] Node Version:  v16.14.0
+[debug] [2022-03-09T20:12:43.334Z] Time:          Wed Mar 09 2022 12:12:43 GMT-0800 (Pacific Standard Time)
+[debug] [2022-03-09T20:12:43.334Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2022-03-09T20:12:43.339Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2022-03-09T20:12:43.339Z] > authorizing via signed-in user (11thromanlegion@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /Users/romanherrera/Desktop/CS_124/cs124-lab2
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2022-03-09T20:14:12.179Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=100
+[debug] [2022-03-09T20:14:12.594Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2022-03-09T20:14:12.594Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[info] i  Using project cs124-lab3-cddb4 (cs124-lab3) 
+[info] 
+=== Hosting Setup
+[info] 
+[info] Your public directory is the folder (relative to your project directory) that
+[info] will contain Hosting assets to be uploaded with firebase deploy. If you
+[info] have a build process for your assets, use your build's output directory.
+[info] 
+[debug] [2022-03-09T20:15:11.799Z] >>> [apiv2][query] GET https://www.gstatic.com/firebasejs/releases.json [none]
+[debug] [2022-03-09T20:15:11.845Z] <<< [apiv2][status] GET https://www.gstatic.com/firebasejs/releases.json 200
+[debug] [2022-03-09T20:15:11.846Z] <<< [apiv2][body] GET https://www.gstatic.com/firebasejs/releases.json {"current":{"version":"9.6.8","browserURL":"https://www.gstatic.com/firebasejs/9.6.8/firebase.js","packageURL":"https://www.gstatic.com/firebasejs/9.6.8/firebase.tgz"},"live":{"version":"9.6","browserURL":"https://www.gstatic.com/firebasejs/live/9.6/firebase.js","packageURL":"https://www.gstatic.com/firebasejs/live/9.6/firebase.tgz"},"components":{"analytics":"https://www.gstatic.com/firebasejs/9.6.8/firebase-analytics.js","app":"https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js","app-check":"https://www.gstatic.com/firebasejs/9.6.8/firebase-app-check.js","auth":"https://www.gstatic.com/firebasejs/9.6.8/firebase-auth.js","auth/cordova":"https://www.gstatic.com/firebasejs/9.6.8/firebase-auth/cordova.js","auth/react-native":"https://www.gstatic.com/firebasejs/9.6.8/firebase-auth/react-native.js","functions":"https://www.gstatic.com/firebasejs/9.6.8/firebase-functions.js","firestore":"https://www.gstatic.com/firebasejs/9.6.8/firebase-firestore.js","firestore/lite":"https://www.gstatic.com/firebasejs/9.6.8/firebase-firestore/lite.js","storage":"https://www.gstatic.com/firebasejs/9.6.8/firebase-storage.js","performance":"https://www.gstatic.com/firebasejs/9.6.8/firebase-performance.js","remote-config":"https://www.gstatic.com/firebasejs/9.6.8/firebase-remote-config.js","messaging":"https://www.gstatic.com/firebasejs/9.6.8/firebase-messaging.js","messaging/sw":"https://www.gstatic.com/firebasejs/9.6.8/firebase-messaging/sw.js","database":"https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js","firestore.memory":"https://www.gstatic.com/firebasejs/9.6.8/firebase-firestore.memory.js"}}
+[info] i  Skipping write of build/index.html 
+[info] 
+[info] i  Detected a .git folder at /Users/romanherrera/Desktop/CS_124/cs124-lab2 
+[info] i  Authorizing with GitHub to upload your service account to a GitHub repository's secrets store. 
+[info] 
+[info] Visit this URL on this device to log in:
+[info] https://github.com/login/oauth/authorize?client_id=89cf50f02ac6aaed3484&state=1000414897&redirect_uri=http%3A%2F%2Flocalhost%3A9005&scope=read%3Auser%20repo%20public_repo
+[info] 
+[info] Waiting for authentication...
+[debug] [2022-03-09T20:28:18.580Z] >>> HTTP REQUEST POST https://github.com/login/oauth/access_token  
+ {"client_id":"89cf50f02ac6aaed3484","client_secret":"3330d14abc895d9a74d5f17cd7a00711fa2c5bf0","code":"e9c8a198ec2657910325","redirect_uri":"http://localhost:9005","state":"1000414897"}
+[debug] [2022-03-09T20:28:18.924Z] <<< HTTP RESPONSE 200 {"server":"GitHub.com","date":"Wed, 09 Mar 2022 20:28:18 GMT","content-type":"application/json; charset=utf-8","transfer-encoding":"chunked","vary":"X-PJAX, X-PJAX-Container, Accept-Encoding, Accept, X-Requested-With","permissions-policy":"interest-cohort=()","etag":"W/\"144a5bef27ce2fb8fa20e84085e236f4\"","cache-control":"max-age=0, private, must-revalidate","strict-transport-security":"max-age=31536000; includeSubdomains; preload","x-frame-options":"deny","x-content-type-options":"nosniff","x-xss-protection":"0","referrer-policy":"origin-when-cross-origin, strict-origin-when-cross-origin","expect-ct":"max-age=2592000, report-uri=\"https://api.github.com/_private/browser/errors\"","content-security-policy":"default-src 'none'; base-uri 'self'; block-all-mixed-content; child-src github.com/assets-cdn/worker/ gist.github.com/assets-cdn/worker/; connect-src 'self' uploads.github.com objects-origin.githubusercontent.com www.githubstatus.com collector.githubapp.com collector.github.com api.github.com github-cloud.s3.amazonaws.com github-production-repository-file-5c1aeb.s3.amazonaws.com github-production-upload-manifest-file-7fdce7.s3.amazonaws.com github-production-user-asset-6210df.s3.amazonaws.com cdn.optimizely.com logx.optimizely.com/v1/events translator.github.com wss://alive.github.com; font-src github.githubassets.com; form-action 'self' github.com gist.github.com objects-origin.githubusercontent.com; frame-ancestors 'none'; frame-src render.githubusercontent.com viewscreen.githubusercontent.com notebooks.githubusercontent.com; img-src 'self' data: github.githubassets.com identicons.github.com collector.githubapp.com collector.github.com github-cloud.s3.amazonaws.com secured-user-images.githubusercontent.com/ *.githubusercontent.com; manifest-src 'self'; media-src github.com user-images.githubusercontent.com/; script-src github.githubassets.com; style-src 'unsafe-inline' github.githubassets.com; worker-src github.com/assets-cdn/worker/ gist.github.com/assets-cdn/worker/","x-github-request-id":"6B8B:6675:F08EC1:12D2456:62290DE2"}
+[debug] [2022-03-09T20:28:18.938Z] >>> [apiv2][query] GET https://api.github.com/user [none]
+[debug] [2022-03-09T20:28:19.390Z] <<< [apiv2][status] GET https://api.github.com/user 200
+[debug] [2022-03-09T20:28:19.391Z] <<< [apiv2][body] GET https://api.github.com/user {"login":"RomanHerrera1","id":60724440,"node_id":"MDQ6VXNlcjYwNzI0NDQw","avatar_url":"https://avatars.githubusercontent.com/u/60724440?v=4","gravatar_id":"","url":"https://api.github.com/users/RomanHerrera1","html_url":"https://github.com/RomanHerrera1","followers_url":"https://api.github.com/users/RomanHerrera1/followers","following_url":"https://api.github.com/users/RomanHerrera1/following{/other_user}","gists_url":"https://api.github.com/users/RomanHerrera1/gists{/gist_id}","starred_url":"https://api.github.com/users/RomanHerrera1/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/RomanHerrera1/subscriptions","organizations_url":"https://api.github.com/users/RomanHerrera1/orgs","repos_url":"https://api.github.com/users/RomanHerrera1/repos","events_url":"https://api.github.com/users/RomanHerrera1/events{/privacy}","received_events_url":"https://api.github.com/users/RomanHerrera1/received_events","type":"User","site_admin":false,"name":"Roman Herrera","company":null,"blog":"","location":null,"email":null,"hireable":null,"bio":null,"twitter_username":null,"public_repos":6,"public_gists":0,"followers":0,"following":0,"created_at":"2020-02-06T03:27:37Z","updated_at":"2022-02-21T22:52:47Z","private_gists":0,"total_private_repos":0,"owned_private_repos":0,"disk_usage":114495,"collaborators":0,"two_factor_authentication":false,"plan":{"name":"free","space":976562499,"collaborators":0,"private_repos":10000}}
+[info] 
+[info] ✔  Success! Logged into GitHub as RomanHerrera1 
+[info] 

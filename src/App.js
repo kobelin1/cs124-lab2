@@ -178,7 +178,7 @@ function App() {
     function Item(props){
         return (<span>
             <input type="checkbox" id={props.id} name={props.name} value={props.value} checked={props.checked} className="bigCheckbox" onChange={() => handleToggleItemSelect(props.id)} />
-                {!props.checked ? <span className={'item_text'}><label htmlFor={props.id}>{props.text}</label><br/><br/></span> : <span className={'item_text'}><label htmlFor={props.id}><s>{props.text}</s></label><br/><br/></span>}
+                {!props.checked ? <span className={'item_text'}><label htmlFor={props.id}><input value={props.text}/></label><br/><br/></span> : <span className={'item_text'}><label htmlFor={props.id}><s>{props.text}</s></label><br/><br/></span>}
             </span>
         );
     }

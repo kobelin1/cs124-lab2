@@ -18,8 +18,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "install-dependencies": "npm install firebase-tools",
-    "firebase-login": "firebase login",
-    "firebase-init": "firebase init"
+    "firebase-login": "npx firebase login",
+    "firebase-init": "npx firebase init"
   },
   "eslintConfig": {
     "extends": [

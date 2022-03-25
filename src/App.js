@@ -147,9 +147,7 @@ function handleToggleItemSelect(checked, selectedItems, setSelectedItems, itemId
 
 function App() {
     // const [listItems, setListItems] = useState(data)
-    // const initialSelected = listItems.filter(item => item.checked)
-    // const initialSelectedIds = []
-    // initialSelected.map(item => initialSelectedIds.push(item.id))
+
     const [filterType, setFilterType] = useState("created_up")
     const [reverse, setReverse] = useState(false)
 
@@ -159,15 +157,7 @@ function App() {
 
     const [listItems, loadingPage, ] = useCollectionData(q);
 
-
-    const [selectedItems, setSelectedItems] = useState(listItems === undefined ? [] : listItems.filter(i => i.checked))
-
-    // console.log(listItems)
-    // if(listItems !== undefined){
-    //     console.log("HERE")
-    //     console.log(listItems.filter(i => i.checked))
-    //     setSelectedItems(listItems.filter(i => i.checked))
-    // }
+    const [selectedItems, setSelectedItems] = useState(listItems ? listItems.filter(item => item.checked) : []);
 
     const [hideCompleted, setHideCompleted] = useState(false)
 
@@ -267,7 +257,15 @@ function App() {
         <br/>
         <input type="text" id="item_enter" name="item_enter" value={curText} onChange={event => {setCurText(event.target.value)}}/>
         <button type="button" id="add_item" name="add_item" onClick={handleNewItem}>Add</button></span>}
-        <ButtonList hideCompleted={hideCompleted} areYouSure={areYouSure} listItems={listItems} addingItem={addingItem} setHideCompleted={setHideCompleted} selectedItems={selectedItems} setAreYouSure={setAreYouSure} handleDeleteClick={handleDeleteClick}/>
+            {selectedItems && !loadingPage && <ButtonList
+                hideCompleted={hideCompleted}
+                areYouSure={areYouSure}
+                listItems={listItems}
+                addingItem={addingItem}
+                setHideCompleted={setHideCompleted}
+                selectedItems={listItems ? listItems.filter(item => item.checked) : []}
+                setAreYouSure={setAreYouSure}
+                handleDeleteClick={handleDeleteClick}/>}
     </div>
     );
 }

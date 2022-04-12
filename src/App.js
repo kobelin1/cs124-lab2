@@ -140,7 +140,7 @@ function App() {
 
     const [curList, setCurList] = useState(undefined)
 
-    const isNarrow = useMediaQuery({maxWidth: 500})
+    const isNarrow = useMediaQuery({maxWidth: 750})
     if (masterListItems && !curList) {
         setCurList(masterListItems[0])
     }
@@ -253,9 +253,9 @@ function App() {
                         <button value="Create new list" onClick={() => handleAddList()}>Create new list</button>
                         <button value="Cancel" onClick={() => handleCancelAddList()}>Cancel</button>
                     </span>
-                    : <span>
+                    : <span id="titleEditors">
                         <button onClick={() => setAddingList(true)}>{isNarrow ? "+" : "Create New List +"}</button>
-                        {masterListItems.length > 1 && <button onClick={()=>setReadyDeleteList(false)}><FaTrashAlt/></button>}
+                        {masterListItems.length > 1 && <button onClick={()=>setReadyDeleteList(false)}>{isNarrow ? <FaTrashAlt/> : "Delete Current List"}</button>}
                     </span>
                 } </span>
                 :
@@ -278,8 +278,8 @@ function App() {
 
                 {!addingList && readyDeleteList && <span>
                     <button aria-label={!editingTitle ? "Edit List Title" : "Finish Editing"} id="editTitle"
-                            onClick={() => setEditingTitle(!editingTitle)}>{editingTitle ? <GrCheckmark/> :
-                        <FaPencilAlt/>}</button> </span>}
+                            onClick={() => setEditingTitle(!editingTitle)}>{editingTitle ? (isNarrow ? <GrCheckmark/> : "Confirm Edit") :
+                        (isNarrow ? <FaPencilAlt/> : "Edit Title")}</button> </span>}
             </div>
 
             {(areYouSure && !addingItem && listItems.length > 0) &&

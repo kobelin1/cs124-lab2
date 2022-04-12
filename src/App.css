@@ -16,14 +16,16 @@
   align-items: center;
   justify-content: center;
   background-color: sandybrown;
-  width: 99%;
+  width: 100%;
   grid-row: 1;
   grid-column: 1/span3;
   text-align: center;
 }
+
 h2 {
   font-size: 2.5em;
 }
+
 .list {
   background-color: white;
   grid-row: 2;
@@ -175,6 +177,7 @@ optgroup {
   text-align: center;
   text-overflow: ellipsis;
   width: 65vw;
+  padding-right: 10px;
 }
 
 #listItems {
@@ -185,12 +188,18 @@ optgroup {
   background-color: sandybrown;
   width: 70vw;
   padding-bottom: 1px;
+  padding-right: 10px;
 }
 
-#editTitle{
-  width: 35px;
-  height: 35px;
+.titleEditors {
+  grid-row: 1;
+  grid-column: 1;
 }
+
+/*#editTitle{*/
+/*  width: 35px;*/
+/*  height: 35px;*/
+/*}*/
 
 #createList{
 

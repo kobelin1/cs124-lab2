@@ -85,21 +85,21 @@ function TaskList(props) {
 
 function Item(props) {
     return (<span>
-            <input aria-label="checkbox" type="checkbox" id={props.id} name={props.name} value={props.value} checked={props.checked}
-                   className="bigCheckbox" aria-checked={(props.checked === "checked")}
+            <input aria-label={(props.name)} type="checkbox" id={props.id} name={props.name} value={props.value} checked={props.checked}
+                   className="bigCheckbox" aria-checked={props.checked}
                    onChange={() => props.handleToggleItemSelect(props.checked, props.selectedItems, props.setSelectedItems, props.id, props.listId)}/>
             <span className={'item_text'}> {!props.checked ?
                 <input className={"item_text"} onChange={e => handleRenaming(e, props.id, props.listId)}
                        defaultValue={props.text}
                        key={props.id} id={props.id}/>
-                : <input className={"item_text_done"} defaultValue={props.text} key={props.id} id={props.id}
+                : <input className={"item_text_done"} aria-disabled={"true"} disabled="disabled" defaultValue={props.text} key={props.id} id={props.id}
                          readOnly={true}/>} </span>
-            <button aria-label="low-priority" onClick={() => handlePriorityClick(1, props.id, props.priority, props.listId)} value={1}
-                  className={1 > props.priority ? "unchecked" : "checked"} aria-pressed={(1 < props.priority) ? "true" : "false"}>!    </button>
-            <button aria-label="medium-priority" onClick={() => handlePriorityClick(2, props.id, props.priority, props.listId)} value={2}
-                  className={2 > props.priority ? "unchecked" : "checked"} aria-pressed={(2 < props.priority) ? "true" : "false"}   >!   </button>
-            <button aria-label="high-priority" onClick={() => handlePriorityClick(3, props.id, props.priority, props.listId)} value={3}
-                  className={3 > props.priority ? "unchecked" : "checked"} aria-pressed={(3 < props.priority) ? "true" : "false"}   >!   </button>
+            <button aria-label={(props.priority === 1) ? "low-priority, current priority" : "low-priority"} onClick={() => handlePriorityClick(1, props.id, props.priority, props.listId)} value={1}
+                  className={1 > props.priority ? "unchecked" : "checked"} aria-pressed={(1 === props.priority) ? "true" : "false"}>!    </button>
+            <button aria-label={(props.priority === 2) ? "medium-priority, current priority" : "medium-priority"} onClick={() => handlePriorityClick(2, props.id, props.priority, props.listId)} value={2}
+                  className={2 > props.priority ? "unchecked" : "checked"} aria-pressed={(2 === props.priority) ? "true" : "false"}   >!   </button>
+            <button aria-label={(props.priority === 3) ? "high-priority, current priority" : "high-priority"} onClick={() => handlePriorityClick(3, props.id, props.priority, props.listId)} value={3}
+                  className={3 > props.priority ? "unchecked" : "checked"} aria-pressed={(3 === props.priority) ? "true" : "false"}   >!   </button>
             <br/><br/>
             </span>
     );
@@ -282,6 +282,16 @@ function App() {
                         (isNarrow ? <FaPencilAlt/> : "Edit Title")}</button> </span>}
             </div>
 
+            {selectedItems && !loadingPage && <ButtonList
+                hideCompleted={hideCompleted}
+                areYouSure={areYouSure}
+                listItems={listItems}
+                addingItem={addingItem}
+                setHideCompleted={setHideCompleted}
+                selectedItems={listItems ? listItems.filter(item => item.checked) : []}
+                setAreYouSure={setAreYouSure}
+                handleDeleteClick={handleDeleteClick}/>}
+
             {(areYouSure && !addingItem && listItems.length > 0) &&
                 <span className={"filter"}><label htmlFor="filter"> Sorting by: </label>
             <select name="filter" id="filter" onChange={e => handleSortChange(e)} value={filterType}>
@@ -306,15 +316,7 @@ function App() {
             setCurText(event.target.value)
         }}/>
         <button type="button" id="add_item" name="add_item" onClick={handleNewItem}>Add</button></span>}
-            {selectedItems && !loadingPage && <ButtonList
-                hideCompleted={hideCompleted}
-                areYouSure={areYouSure}
-                listItems={listItems}
-                addingItem={addingItem}
-                setHideCompleted={setHideCompleted}
-                selectedItems={listItems ? listItems.filter(item => item.checked) : []}
-                setAreYouSure={setAreYouSure}
-                handleDeleteClick={handleDeleteClick}/>}
+
         </div>
     );
 }

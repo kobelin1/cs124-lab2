@@ -3,8 +3,11 @@ import React, {useState} from "react";
 import {generateUniqueID} from "web-vitals/dist/modules/lib/generateUniqueID";
 import {useCollectionData} from "react-firebase-hooks/firestore";
 
-import {FaPencilAlt} from 'react-icons/fa';
+import {FaPencilAlt, FaTrashAlt} from 'react-icons/fa';
 import {GrCheckmark} from 'react-icons/gr';
+
+// import {GiHamburgerMenu} from 'react-icons/gi';
+import {useMediaQuery} from 'react-responsive';
 
 import {initializeApp} from "firebase/app";
 import {serverTimestamp} from "firebase/firestore";
@@ -25,6 +28,7 @@ const db = getFirestore(firebaseApp);
 
 const collectionName = "MasterList"
 const listName = "List"
+
 // const masterList = collection(db, "MasterList")
 
 // setDoc(doc(db, "MasterList", listId, "List", id))
@@ -33,7 +37,6 @@ const listName = "List"
 // db.collection("MasterList").doc(ListId).collection("Tasks").doc(TaskId)
 // setDoc(doc(masterList, listId, taskList, )
 // q = query(tasksCollection)
-
 
 
 function ButtonList(props) {
@@ -65,13 +68,13 @@ function TaskList(props) {
                     <Item id={item.id} key={item.id} checked={item.checked} text={item.text}
                           handleToggleItemSelect={handleToggleItemSelect} listItems={props.listItems}
                           selectedItems={props.selectedItems} setSelectedItems={props.setSelectedItems}
-                          priority={item.priority} listId = {props.listId}/>)
+                          priority={item.priority} listId={props.listId}/>)
                 : props.listItems.map((item) => <Item id={item.id} key={item.id} checked={item.checked} text={item.text}
                                                       handleToggleItemSelect={handleToggleItemSelect}
                                                       listItems={props.listItems} selectedItems={props.selectedItems}
                                                       setSelectedItems={props.setSelectedItems}
                                                       priority={item.priority}
-                                                      listId = {props.listId}/>)}
+                                                      listId={props.listId}/>)}
             {!props.addingItem && props.areYouSure && <button type={"button"} id="item_button" name="item_button"
                                                               onClick={() => props.setAddingItem(true)}>Create New Item
                 +</button>}
@@ -86,7 +89,8 @@ function Item(props) {
                    className="bigCheckbox" aria-checked={(props.checked === "checked")}
                    onChange={() => props.handleToggleItemSelect(props.checked, props.selectedItems, props.setSelectedItems, props.id, props.listId)}/>
             <span className={'item_text'}> {!props.checked ?
-                <input className={"item_text"} onChange={e => handleRenaming(e, props.id, props.listId)} defaultValue={props.text}
+                <input className={"item_text"} onChange={e => handleRenaming(e, props.id, props.listId)}
+                       defaultValue={props.text}
                        key={props.id} id={props.id}/>
                 : <input className={"item_text_done"} defaultValue={props.text} key={props.id} id={props.id}
                          readOnly={true}/>} </span>
@@ -117,7 +121,6 @@ function handleRenaming(e, id, listId) {
 }
 
 function handleToggleItemSelect(checked, selectedItems, setSelectedItems, itemId, listId) {
-    console.log(listId)
     setDoc(doc(db, collectionName, listId, listName, itemId),
         {"checked": !checked}, {merge: true}).then(() => console.log("Toggled item"))
 
@@ -135,22 +138,16 @@ function App() {
     const masterq = query(collection(db, collectionName));
     const [masterListItems, masterLoadingPage] = useCollectionData(masterq);
 
-    // console.log("loading", masterLoadingPage)
-    // console.log("masterListItems", masterListItems)
+    const [curList, setCurList] = useState(undefined)
 
-    const [curList, setCurList] = useState( undefined)
-
+    const isNarrow = useMediaQuery({maxWidth: 500})
     if (masterListItems && !curList) {
         setCurList(masterListItems[0])
     }
 
-    // console.log("slice", )
-    // console.log("curList", curList)
-    // console.log(masterLoadingPage ? [] : masterListItems[0].id)
-
     const q = reverse ?
-        query(collection(db, collectionName, masterLoadingPage ? "1" : masterListItems[0].id, listName), orderBy(filterType.slice(0, filterType.length - 3), "desc"))
-        : query(collection(db, collectionName, masterLoadingPage ? "1" : masterListItems[0].id, listName), orderBy(filterType.slice(0, filterType.length - 3), "asc"));
+        query(collection(db, collectionName, masterLoadingPage ? "1" : (curList ? curList.id : masterListItems[0].id), listName), orderBy(filterType.slice(0, filterType.length - 3), "desc"))
+        : query(collection(db, collectionName, masterLoadingPage ? "1" : (curList ? curList.id : masterListItems[0].id), listName), orderBy(filterType.slice(0, filterType.length - 3), "asc"));
 
     const [listItems, loadingPage,] = useCollectionData(q);
 
@@ -159,10 +156,14 @@ function App() {
     const [hideCompleted, setHideCompleted] = useState(false)
 
     const [curText, setCurText] = useState("")
+    const [curTitle, setCurTitle] = useState("")
 
     const [addingItem, setAddingItem] = useState(false)
+    const [addingList, setAddingList] = useState(false)
 
     const [areYouSure, setAreYouSure] = useState(true)
+
+    const [readyDeleteList, setReadyDeleteList] = useState(true)
 
     const [editingTitle, setEditingTitle] = useState(false)
 
@@ -187,8 +188,7 @@ function App() {
 
     function handleDeleteClick() {
         // noinspection JSCheckFunctionSignatures
-        selectedItems.forEach(id => deleteDoc(doc(db, collectionName,
-            curList ? curList.id : masterListItems[0].id , listName , id)));
+        selectedItems.forEach(id => deleteDoc(doc(db, collectionName, curList.id, listName, id)));
         setSelectedItems([]);
         setAreYouSure(true);
     }
@@ -204,22 +204,82 @@ function App() {
 
     function handleTitleChange(e, listId) {
         setDoc(doc(db, collectionName, listId),
-            {"title": e.target.value}, {merge:true}).then(() => console.log("Set new name"))
+            {"title": e.target.value}, {merge: true}).then(() => console.log("Set new name"))
+        setCurList({...curList, "title": e.target.value});
+    }
+
+    function handleAddList() {
+        const uniqueId = generateUniqueID()
+        // noinspection JSCheckFunctionSignatures
+        setDoc(doc(db, collectionName, uniqueId),
+            {
+                "id": uniqueId,
+                "title": curTitle,
+            }).then(() => console.log("Added new list"));
+        setCurTitle("")
+        setCurList({
+            "id": uniqueId,
+            "title": curTitle,
+        })
+        setAddingList(false)
+    }
+
+    function handleCancelAddList() {
+        setCurTitle("")
+        setAddingList(false)
+    }
+
+    function handleListChange(e) {
+        let dropd = document.getElementById("listItems");
+        let selectedId = dropd.options[dropd.selectedIndex].id;
+        setCurList({title: e.target.value, id: selectedId})
+    }
+
+    function handleDeleteList(){
+        deleteDoc(doc(db, collectionName, curList.id)).then(() => console.log("Deleted List"))
+        setReadyDeleteList(true)
+        setCurList(masterListItems[0])
     }
 
 
     return (<div className={"body"}>
             <div className="title_card">
-                {editingTitle ?
-                <h2><input type={"text"} defaultValue={curList.title} id="titleText"
-                           onChange={(e) => handleTitleChange(e, curList ? curList.id : masterListItems[0].id)}>
-                    {curList.title}</input></h2>
-                : <h2><select name="listItems" id="listItems" onChange={e => setCurList(e.target.value)} value={curList.title}>
-                        <optgroup>
-                            {masterListItems.map((list) => <option value={list.title} key={list.id}>{list.title}</option>)}
-                        </optgroup>
-                    </select></h2>}
-                <button aria-label={!editingTitle ? "Edit List Title" : "Finish Editing"} id="editTitle" onClick={() => setEditingTitle(!editingTitle)}>{editingTitle ? <GrCheckmark/> : <FaPencilAlt/>}</button>
+
+                {readyDeleteList ? <span>
+                {addingList ?
+                    <span>
+                        <label htmlFor={"item_enter"}>Enter name of new list</label>
+                        <input type="text" className="item_enter" onChange={(e) => setCurTitle(e.target.value)}/>
+                        <button value="Create new list" onClick={() => handleAddList()}>Create new list</button>
+                        <button value="Cancel" onClick={() => handleCancelAddList()}>Cancel</button>
+                    </span>
+                    : <span>
+                        <button onClick={() => setAddingList(true)}>{isNarrow ? "+" : "Create New List +"}</button>
+                        {masterListItems.length > 1 && <button onClick={()=>setReadyDeleteList(false)}><FaTrashAlt/></button>}
+                    </span>
+                } </span>
+                :
+                    <span>
+                        <button onClick={() => handleDeleteList()}>Confirm Deletion of Current List</button>
+                        <button onClick={() => setReadyDeleteList(true)}>Cancel</button>
+                    </span>}
+
+                {!addingList && readyDeleteList && <span>
+                    {editingTitle ?
+                        <h2><input type={"text"} defaultValue={curList.title} id="titleText"
+                                   onChange={(e) => handleTitleChange(e, curList.id)}/></h2>
+                        : <h2><select name="listItems" id="listItems" onChange={(e) => handleListChange(e)}
+                                      value={curList.title}>
+                            <optgroup>
+                                {masterListItems.map((list) => <option value={list.title} id={list.id}
+                                                                       key={list.id}>{list.title}</option>)}
+                            </optgroup>
+                        </select></h2>} </span>}
+
+                {!addingList && readyDeleteList && <span>
+                    <button aria-label={!editingTitle ? "Edit List Title" : "Finish Editing"} id="editTitle"
+                            onClick={() => setEditingTitle(!editingTitle)}>{editingTitle ? <GrCheckmark/> :
+                        <FaPencilAlt/>}</button> </span>}
             </div>
 
             {(areYouSure && !addingItem && listItems.length > 0) &&

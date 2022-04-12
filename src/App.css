@@ -169,12 +169,12 @@ optgroup {
 }
 
 #titleText {
-  font-size: 80%;
+  font-size: 70%;
   font-weight: bold;
   background-color:white;
   text-align: center;
   text-overflow: ellipsis;
-  width: 70vw;
+  width: 65vw;
 }
 
 #listItems {

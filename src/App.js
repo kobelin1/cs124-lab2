@@ -3,6 +3,9 @@ import React, {useState} from "react";
 import {generateUniqueID} from "web-vitals/dist/modules/lib/generateUniqueID";
 import {useCollectionData} from "react-firebase-hooks/firestore";
 
+import {FaPencilAlt} from 'react-icons/fa';
+import {GrCheckmark} from 'react-icons/gr';
+
 import {initializeApp} from "firebase/app";
 import {serverTimestamp} from "firebase/firestore";
 
@@ -19,7 +22,19 @@ const firebaseConfig = {
 
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
-const collectionName = "List"
+
+const collectionName = "MasterList"
+const listName = "List"
+// const masterList = collection(db, "MasterList")
+
+// setDoc(doc(db, "MasterList", listId, "List", id))
+
+// const taskList = collection(db, "List")
+// db.collection("MasterList").doc(ListId).collection("Tasks").doc(TaskId)
+// setDoc(doc(masterList, listId, taskList, )
+// q = query(tasksCollection)
+
+
 
 function ButtonList(props) {
     return (<div className="list">
@@ -50,12 +65,13 @@ function TaskList(props) {
                     <Item id={item.id} key={item.id} checked={item.checked} text={item.text}
                           handleToggleItemSelect={handleToggleItemSelect} listItems={props.listItems}
                           selectedItems={props.selectedItems} setSelectedItems={props.setSelectedItems}
-                          priority={item.priority}/>)
+                          priority={item.priority} listId = {props.listId}/>)
                 : props.listItems.map((item) => <Item id={item.id} key={item.id} checked={item.checked} text={item.text}
                                                       handleToggleItemSelect={handleToggleItemSelect}
                                                       listItems={props.listItems} selectedItems={props.selectedItems}
                                                       setSelectedItems={props.setSelectedItems}
-                                                      priority={item.priority}/>)}
+                                                      priority={item.priority}
+                                                      listId = {props.listId}/>)}
             {!props.addingItem && props.areYouSure && <button type={"button"} id="item_button" name="item_button"
                                                               onClick={() => props.setAddingItem(true)}>Create New Item
                 +</button>}
@@ -66,43 +82,43 @@ function TaskList(props) {
 
 function Item(props) {
     return (<span>
-            <input type="checkbox" id={props.id} name={props.name} value={props.value} checked={props.checked}
-                   className="bigCheckbox"
-                   onChange={() => props.handleToggleItemSelect(props.checked, props.selectedItems, props.setSelectedItems, props.id)}/>
+            <input aria-label="checkbox" type="checkbox" id={props.id} name={props.name} value={props.value} checked={props.checked}
+                   className="bigCheckbox" aria-checked={(props.checked === "checked")}
+                   onChange={() => props.handleToggleItemSelect(props.checked, props.selectedItems, props.setSelectedItems, props.id, props.listId)}/>
             <span className={'item_text'}> {!props.checked ?
-                <input className={"item_text"} onChange={e => handleRenaming(e, props.id)} defaultValue={props.text}
+                <input className={"item_text"} onChange={e => handleRenaming(e, props.id, props.listId)} defaultValue={props.text}
                        key={props.id} id={props.id}/>
                 : <input className={"item_text_done"} defaultValue={props.text} key={props.id} id={props.id}
                          readOnly={true}/>} </span>
-            <button onClick={() => handlePriorityClick(1, props.id, props.priority)} value={1}
-                  className={1 > props.priority ? "unchecked" : "checked"}> !   </button>
-            <button onClick={() => handlePriorityClick(2, props.id, props.priority)} value={2}
-                  className={2 > props.priority ? "unchecked" : "checked"}>!   </button>
-            <button onClick={() => handlePriorityClick(3, props.id, props.priority)} value={3}
-                  className={3 > props.priority ? "unchecked" : "checked"}>!   </button>
+            <button aria-label="low-priority" onClick={() => handlePriorityClick(1, props.id, props.priority, props.listId)} value={1}
+                  className={1 > props.priority ? "unchecked" : "checked"} aria-pressed={(1 < props.priority) ? "true" : "false"}>!    </button>
+            <button aria-label="medium-priority" onClick={() => handlePriorityClick(2, props.id, props.priority, props.listId)} value={2}
+                  className={2 > props.priority ? "unchecked" : "checked"} aria-pressed={(2 < props.priority) ? "true" : "false"}   >!   </button>
+            <button aria-label="high-priority" onClick={() => handlePriorityClick(3, props.id, props.priority, props.listId)} value={3}
+                  className={3 > props.priority ? "unchecked" : "checked"} aria-pressed={(3 < props.priority) ? "true" : "false"}   >!   </button>
             <br/><br/>
             </span>
     );
 }
 
-function handlePriorityClick(value, id, priority) {
+function handlePriorityClick(value, id, priority, listId) {
     if (value === priority) {
-        setDoc(doc(db, collectionName, id),
+        setDoc(doc(db, collectionName, listId, listName, id),
             {"priority": value - 1}, {merge: true}).then(() => console.log("Set new priority"))
     } else {
-        setDoc(doc(db, collectionName, id),
+        setDoc(doc(db, collectionName, listId, listName, id),
             {"priority": value}, {merge: true}).then(() => console.log("Set new priority"))
     }
 }
 
-
-function handleRenaming(e, id) {
-    setDoc(doc(db, collectionName, id),
+function handleRenaming(e, id, listId) {
+    setDoc(doc(db, collectionName, listId, listName, id),
         {"text": e.target.value}, {merge: true}).then(() => console.log("Set new name"))
 }
 
-function handleToggleItemSelect(checked, selectedItems, setSelectedItems, itemId) {
-    setDoc(doc(db, collectionName, itemId),
+function handleToggleItemSelect(checked, selectedItems, setSelectedItems, itemId, listId) {
+    console.log(listId)
+    setDoc(doc(db, collectionName, listId, listName, itemId),
         {"checked": !checked}, {merge: true}).then(() => console.log("Toggled item"))
 
     if (selectedItems.includes(itemId)) {
@@ -116,9 +132,25 @@ function App() {
     const [filterType, setFilterType] = useState("created_up")
     const [reverse, setReverse] = useState(false)
 
+    const masterq = query(collection(db, collectionName));
+    const [masterListItems, masterLoadingPage] = useCollectionData(masterq);
+
+    // console.log("loading", masterLoadingPage)
+    // console.log("masterListItems", masterListItems)
+
+    const [curList, setCurList] = useState( undefined)
+
+    if (masterListItems && !curList) {
+        setCurList(masterListItems[0])
+    }
+
+    // console.log("slice", )
+    // console.log("curList", curList)
+    // console.log(masterLoadingPage ? [] : masterListItems[0].id)
+
     const q = reverse ?
-        query(collection(db, collectionName), orderBy(filterType.slice(0, filterType.length - 3), "desc"))
-        : query(collection(db, collectionName), orderBy(filterType.slice(0, filterType.length - 3), "asc"));
+        query(collection(db, collectionName, masterLoadingPage ? "1" : masterListItems[0].id, listName), orderBy(filterType.slice(0, filterType.length - 3), "desc"))
+        : query(collection(db, collectionName, masterLoadingPage ? "1" : masterListItems[0].id, listName), orderBy(filterType.slice(0, filterType.length - 3), "asc"));
 
     const [listItems, loadingPage,] = useCollectionData(q);
 
@@ -127,17 +159,20 @@ function App() {
     const [hideCompleted, setHideCompleted] = useState(false)
 
     const [curText, setCurText] = useState("")
+
     const [addingItem, setAddingItem] = useState(false)
 
     const [areYouSure, setAreYouSure] = useState(true)
 
-    if (loadingPage) {
+    const [editingTitle, setEditingTitle] = useState(false)
+
+    if (loadingPage || masterLoadingPage) {
         return (<span><h2>Page is loading...</h2></span>);
     }
 
     function handleNewItem() {
         const uniqueId = generateUniqueID()
-        setDoc(doc(db, collectionName, uniqueId),
+        setDoc(doc(db, collectionName, curList ? curList.id : masterListItems[0].id, listName, uniqueId),
             {
                 id: uniqueId,
                 text: curText,
@@ -152,7 +187,8 @@ function App() {
 
     function handleDeleteClick() {
         // noinspection JSCheckFunctionSignatures
-        selectedItems.forEach(id => deleteDoc(doc(db, collectionName, id)));
+        selectedItems.forEach(id => deleteDoc(doc(db, collectionName,
+            curList ? curList.id : masterListItems[0].id , listName , id)));
         setSelectedItems([]);
         setAreYouSure(true);
     }
@@ -166,10 +202,26 @@ function App() {
         }
     }
 
+    function handleTitleChange(e, listId) {
+        setDoc(doc(db, collectionName, listId),
+            {"title": e.target.value}, {merge:true}).then(() => console.log("Set new name"))
+    }
+
+
     return (<div className={"body"}>
             <div className="title_card">
-                <h2>Your TO-DO List</h2>
+                {editingTitle ?
+                <h2><input type={"text"} defaultValue={curList.title} id="titleText"
+                           onChange={(e) => handleTitleChange(e, curList ? curList.id : masterListItems[0].id)}>
+                    {curList.title}</input></h2>
+                : <h2><select name="listItems" id="listItems" onChange={e => setCurList(e.target.value)} value={curList.title}>
+                        <optgroup>
+                            {masterListItems.map((list) => <option value={list.title} key={list.id}>{list.title}</option>)}
+                        </optgroup>
+                    </select></h2>}
+                <button aria-label={!editingTitle ? "Edit List Title" : "Finish Editing"} id="editTitle" onClick={() => setEditingTitle(!editingTitle)}>{editingTitle ? <GrCheckmark/> : <FaPencilAlt/>}</button>
             </div>
+
             {(areYouSure && !addingItem && listItems.length > 0) &&
                 <span className={"filter"}><label htmlFor="filter"> Sorting by: </label>
             <select name="filter" id="filter" onChange={e => handleSortChange(e)} value={filterType}>
@@ -185,7 +237,8 @@ function App() {
             {listItems.length === 0 && <i>There is nothing in your list!</i>}
             {!addingItem && <TaskList hideCompleted={hideCompleted} listItems={listItems} addingItem={addingItem}
                                       areYouSure={areYouSure} setAddingItem={setAddingItem}
-                                      selectedItems={selectedItems} setSelectedItems={setSelectedItems}/>}
+                                      selectedItems={selectedItems} setSelectedItems={setSelectedItems}
+                                      listId={curList ? curList.id : masterListItems[0].id}/>}
             {addingItem && <span className={"item_enter"}>
         <label htmlFor="item_enter"> Enter new item text:</label>
         <br/>

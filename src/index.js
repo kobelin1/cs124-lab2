@@ -9,11 +9,6 @@ import reportWebVitals from './reportWebVitals';
 ReactDOM.render(
   <React.StrictMode>
       <App />
-      {/*<div>*/}
-      {/*    {data[0].id}*/}
-      {/*    <br />*/}
-      {/*    {data[1].id}*/}
-      {/*</div>*/}
   </React.StrictMode>,
   document.getElementById('root')
 );

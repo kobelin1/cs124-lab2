@@ -5,8 +5,25 @@ import {useCollectionData} from "react-firebase-hooks/firestore";
 
 import {FaPencilAlt, FaTrashAlt} from 'react-icons/fa';
 import {GrCheckmark} from 'react-icons/gr';
+import {FcGoogle} from 'react-icons/fc';
+import {BsPersonCircle, BsFillPersonPlusFill} from 'react-icons/bs';
+import {FiSend} from 'react-icons/fi';
 
-// import {GiHamburgerMenu} from 'react-icons/gi';
+import Alert from './Alert';
+
+
+import {
+    useAuthState,
+    useCreateUserWithEmailAndPassword,
+    useSignInWithEmailAndPassword,
+    useSignInWithGoogle
+} from 'react-firebase-hooks/auth';
+
+import {
+    getAuth,
+    sendEmailVerification,
+    signOut } from "firebase/auth";
+
 import {useMediaQuery} from 'react-responsive';
 
 import {initializeApp} from "firebase/app";
@@ -25,6 +42,10 @@ const firebaseConfig = {
 
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
+const auth = getAuth();
+
+// Get to this later :/
+// const collectionName = "People-AuthenticationRequired"
 
 const collectionName = "MasterList"
 const listName = "List"
@@ -38,6 +59,103 @@ const listName = "List"
 // setDoc(doc(masterList, listId, taskList, )
 // q = query(tasksCollection)
 
+
+function App(props) {
+    const [user, loading, error] = useAuthState(auth);
+    // function verifyEmail() {
+    //     sendEmailVerification(user).then(() => console.log("Sent verification email."));
+    // }
+
+    if (loading) {
+        return <p>Checking...</p>;
+    } else if (user) {
+        return <div>
+            <SignedInApp {...props} user={user}/>
+            {/*<p>Signed in as {user.displayName || user.email}</p>*/}
+            {/*<button type="button" onClick={() => signOut(auth)}>Sign out</button>*/}
+            {/*{!user.emailVerified && <button type="button" onClick={verifyEmail}>Verify email</button>}*/}
+        </div>
+    } else {
+        return <>
+            {error && <p>Error App: {error.message}</p>}
+            <div><SignIn key="Sign In" id="signIn"/></div>
+            <div><SignUp key="Sign Up" id="signUp"/></div>
+        </>
+    }
+}
+
+
+function SignIn() {
+    const [
+        signInWithEmailAndPassword,
+        user1, loading1, error1
+    ] = useSignInWithEmailAndPassword(auth);
+    const [
+        signInWithGoogle,
+        user2, loading2, error2
+    ] = useSignInWithGoogle(auth);
+    const [email, setEmail] = useState("");
+    const [pw, setPw] = useState("");
+
+    if (user1 || user2) {
+        // Shouldn't happen because App should see that
+        // we are signed in.
+        return <div>Unexpectedly signed in already</div>
+    } else if (loading1 || loading2) {
+        return <p>Logging in…</p>
+    }
+    return <div>
+        {error1 && <p>"Error logging in: " {error1.message}</p>}
+        {error2 && <p>"Error logging in: " {error2.message}</p>}
+        <label htmlFor='email' id='email_label'>email: </label>
+        <input type="text" id='email' value={email}
+               onChange={e=>setEmail(e.target.value)}/>
+        <br/>
+        <label htmlFor='pw'>password: </label>
+        <input type="text" id='pw' value={pw}
+               onChange={e=>setPw(e.target.value)}/>
+        <br/>
+        <button onClick={() => signInWithEmailAndPassword(email, pw)}>
+            Sign in
+        </button>
+        <button onClick={() => signInWithGoogle()}>
+            <FcGoogle/> Sign in with Google
+        </button>
+        <hr/>
+    </div>
+}
+
+function SignUp() {
+    const [
+        createUserWithEmailAndPassword,
+        userCredential, loading, error
+    ] = useCreateUserWithEmailAndPassword(auth);
+    const [email, setEmail] = useState("");
+    const [pw, setPw] = useState("");
+
+    if (userCredential) {
+        // Shouldn't happen because App should see that
+        // we are signed in.
+        return <div>Unexpectedly signed in already</div>
+    } else if (loading) {
+        return <p>Signing up…</p>
+    }
+    return <div>
+        {error && <p>"Error signing up: " {error.message}</p>}
+        <label htmlFor='email'>email: </label>
+        <input type="text" id='email' value={email}
+               onChange={e=>setEmail(e.target.value)}/>
+        <br/>
+        <label htmlFor='pw'>password: </label>
+        <input type="text" id='pw' value={pw}
+               onChange={e=>setPw(e.target.value)}/>
+        <br/>
+        <button onClick={() =>
+            createUserWithEmailAndPassword(email, pw)}>
+            Sign Up
+        </button>
+    </div>
+}
 
 function ButtonList(props) {
     return (<div className="list">
@@ -131,23 +249,39 @@ function handleToggleItemSelect(checked, selectedItems, setSelectedItems, itemId
     }
 }
 
-function App() {
+function SignedInApp(props) {
     const [filterType, setFilterType] = useState("created_up")
     const [reverse, setReverse] = useState(false)
 
     const masterq = query(collection(db, collectionName));
+
     const [masterListItems, masterLoadingPage] = useCollectionData(masterq);
 
     const [curList, setCurList] = useState(undefined)
 
     const isNarrow = useMediaQuery({maxWidth: 750})
+
+    const [showAlert, setShowAlert] = useState(false);
+
+    function handleAlertOK() {
+        console.log('the frob should be blitzened here');
+    }
+
+    function toggleModal() {
+        setShowAlert(!showAlert);
+    }
+
+    function verifyEmail() {
+        sendEmailVerification(props.user).then(() => console.log("Sent verification email."));
+    }
+
     if (masterListItems && !curList) {
         setCurList(masterListItems[0])
     }
 
     const q = reverse ?
-        query(collection(db, collectionName, masterLoadingPage ? "1" : (curList ? curList.id : masterListItems[0].id), listName), orderBy(filterType.slice(0, filterType.length - 3), "desc"))
-        : query(collection(db, collectionName, masterLoadingPage ? "1" : (curList ? curList.id : masterListItems[0].id), listName), orderBy(filterType.slice(0, filterType.length - 3), "asc"));
+        query(collection(db, collectionName, masterLoadingPage ? "1" : (curList ? curList.id : (masterListItems ? masterListItems[0].id : "1")), listName), orderBy(filterType.slice(0, filterType.length - 3), "desc"))
+        : query(collection(db, collectionName, masterLoadingPage ? "1" : (curList ? curList.id : (masterListItems ? masterListItems[0].id : "1")), listName), orderBy(filterType.slice(0, filterType.length - 3), "asc"));
 
     const [listItems, loadingPage,] = useCollectionData(q);
 
@@ -166,6 +300,8 @@ function App() {
     const [readyDeleteList, setReadyDeleteList] = useState(true)
 
     const [editingTitle, setEditingTitle] = useState(false)
+
+    const [shareEmail, setShareEmail] = useState("")
 
     if (loadingPage || masterLoadingPage) {
         return (<span><h2>Page is loading...</h2></span>);
@@ -241,6 +377,11 @@ function App() {
         setCurList(masterListItems[0])
     }
 
+    function handleShareEmail(){
+
+    }
+
+    // console.log(props.user.uid)
 
     return (<div className={"body"}>
             <div className="title_card">
@@ -281,6 +422,26 @@ function App() {
                             onClick={() => setEditingTitle(!editingTitle)}>{editingTitle ? (isNarrow ? <GrCheckmark/> : "Confirm Edit") :
                         (isNarrow ? <FaPencilAlt/> : "Edit Title")}</button> </span>}
             </div>
+
+            <span id="loggedInButtons">
+                <BsPersonCircle onClick={toggleModal} size={isNarrow ? 30 : 40}/>
+                {/*<p>Signed in as {props.user.displayName || props.user.email}</p>*/}
+                {/*<button type="button" onClick={() => signOut(auth)}>Sign out</button>*/}
+                {/*{!props.user.emailVerified && <button type="button" onClick={verifyEmail}>Verify email</button>}*/}
+            </span>
+
+            {showAlert && <Alert onClose={toggleModal} onOK={handleAlertOK}>
+                <div id="alert_title">
+                    {<BsFillPersonPlusFill id="alert_icon" size={isNarrow ? 15 : 25}/>} <span id={isNarrow ? "alert_text_narrow" : "alert_text"}>Share with new users</span>
+                    <br/>
+                    <span><input id={isNarrow ? "add_user_narrow" : "add_user"} onChange={(e) => setShareEmail(e.target.value)}/></span>
+                    {isNarrow && <br/>}
+                    <span><button id={isNarrow ? "share_button_narrow" : "share_button"} onClick={() => handleShareEmail()}>{isNarrow ? <FiSend size={12}/> : "Send"}</button></span>
+
+                    <hr/>
+                </div>
+            </Alert>}
+
 
             {selectedItems && !loadingPage && <ButtonList
                 hideCompleted={hideCompleted}

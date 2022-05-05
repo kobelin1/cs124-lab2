@@ -27,9 +27,8 @@ import {
 import {useMediaQuery} from 'react-responsive';
 
 import {initializeApp} from "firebase/app";
-import {serverTimestamp} from "firebase/firestore";
 
-import {collection, deleteDoc, doc, getFirestore, query, setDoc, orderBy} from "firebase/firestore";
+import {collection, deleteDoc, doc, getFirestore, query, setDoc, orderBy, serverTimestamp, where} from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDKYZNUq0Pdmt0jdMMUK_OD4f1Og9R1Vm4",
@@ -62,18 +61,12 @@ const listName = "List"
 
 function App(props) {
     const [user, loading, error] = useAuthState(auth);
-    // function verifyEmail() {
-    //     sendEmailVerification(user).then(() => console.log("Sent verification email."));
-    // }
 
     if (loading) {
         return <p>Checking...</p>;
     } else if (user) {
         return <div>
             <SignedInApp {...props} user={user}/>
-            {/*<p>Signed in as {user.displayName || user.email}</p>*/}
-            {/*<button type="button" onClick={() => signOut(auth)}>Sign out</button>*/}
-            {/*{!user.emailVerified && <button type="button" onClick={verifyEmail}>Verify email</button>}*/}
         </div>
     } else {
         return <>
@@ -253,7 +246,7 @@ function SignedInApp(props) {
     const [filterType, setFilterType] = useState("created_up")
     const [reverse, setReverse] = useState(false)
 
-    const masterq = query(collection(db, collectionName));
+    const masterq = query(collection(db, collectionName), where("users", "array-contains-any", [{email: props.user.email, perms:"Edit",}, {email: props.user.email, perms:"View",}]));
 
     const [masterListItems, masterLoadingPage] = useCollectionData(masterq);
 
@@ -364,7 +357,9 @@ function SignedInApp(props) {
                 "id": uniqueId,
                 "title": curTitle,
                 "owner": props.user.uid,
-                "users": [{"email": props.user.email, "perms": "Edit"}]
+                "users": [{"email": props.user.email, "perms": "Edit"}],
+                "viewers": [props.user.email],
+                "editors": [props.user.email]
             }).then(() => console.log("Added new list"));
         setCurTitle("")
 
@@ -372,21 +367,14 @@ function SignedInApp(props) {
             "id": uniqueId,
             "title": curTitle,
             "owner": props.user.uid,
-            "users": [{"email": props.user.email, "perms": "Edit"}]
+            "users": [{"email": props.user.email, "perms": "Edit"}],
+            "viewers": [props.user.email],
+            "editors": [props.user.email]
         }
 
         setCurList(newCurList)
+        setSharedUser(newCurList.users[0])
         setAddingList(false)
-
-        // const uniqueId2 = generateUniqueID()
-        // setDoc(doc(db, collectionName, newCurList ? newCurList.id : masterListItems[0].id, listName, uniqueId2),
-        //     {
-        //         id: uniqueId,
-        //         text: "Sample Text!",
-        //         checked: false,
-        //         created: serverTimestamp(),
-        //         priority: 0
-        //     }).then(() => console.log("Added new item"));
     }
 
     function handleCancelAddList() {
@@ -398,13 +386,18 @@ function SignedInApp(props) {
         let dropd = document.getElementById("listItems");
         // let selectedList = dropd.options[dropd.selectedIndex];
         let selectedList = masterListItems[dropd.selectedIndex];
-        setCurList({title: e.target.value, id: selectedList.id, owner: selectedList.owner, users: selectedList.users})
+        setCurList({title: e.target.value, id: selectedList.id, owner: selectedList.owner,
+            users: selectedList.users, viewers: selectedList.viewers, editors: selectedList.editors})
+        setSharedUser(selectedList.users[0])
     }
 
     function handleDeleteList(){
+        listItems.forEach((item) => deleteDoc(doc(db, collectionName, curList.id, listName, item.id)));
         deleteDoc(doc(db, collectionName, curList.id)).then(() => console.log("Deleted List"))
+
         setReadyDeleteList(true)
         setCurList(masterListItems[0])
+
     }
 
     function handleShareEmail(){
@@ -414,20 +407,35 @@ function SignedInApp(props) {
         }
 
         let userList = curList.users
+        let viewList = curList.viewers
+        let editList = curList.editors
+
         userList.push({"email": shareEmail, "perms": newUserPerms})
+        viewList.push(shareEmail)
+        if(newUserPerms === "Edit"){
+            editList.push(shareEmail)
+        }
 
         setDoc(doc(db, collectionName, curList.id),
-            {"users": userList}, {merge: true}).then(() => console.log("Shared with new user"))
+            {"users": userList, "viewers": viewList, "editors": editList}, {merge: true}).then(() => console.log("Shared with new user"))
 
-        setCurList({...curList, "users": userList});
+        setCurList({...curList, "users": userList, "viewers": viewList, "editors": editList});
         setShareEmail("")
     }
 
     function handleChangeSharedUserPerms(e) {
         const updatedUserList = curList.users.map((user) => user === sharedUser ? {...user, "perms": e.target.value} : user)
+
+        let updatedEditList = curList.editors
+        if(e.target.value === "View"){
+            updatedEditList = curList.viewers.filter((user) => user !== sharedUser)
+        } else {
+            updatedEditList.push(shareEmail)
+        }
+
         setDoc(doc(db, collectionName, curList.id),
-            {"users": updatedUserList}, {merge: true}).then(() => console.log("Changed user permissions"))
-        setCurList({...curList, "users": updatedUserList})
+            {"users": updatedUserList, "editors": updatedEditList}, {merge: true}).then(() => console.log("Changed user permissions"))
+        setCurList({...curList, "users": updatedUserList, "editors": updatedEditList})
         setSharedUserPerms(e.target.value)
     }
 
@@ -441,9 +449,11 @@ function SignedInApp(props) {
 
     function handleDeletePerson() {
         const updatedUserList = curList.users.filter((user) => user !== sharedUser)
+        const updatedViewerList = curList.viewers.filter((user) => user !== sharedUser)
+        const updatedEditList = curList.editors.filter((user) => user !== sharedUser)
         setDoc(doc(db, collectionName, curList.id),
-            {"users": updatedUserList}, {merge: true}).then(() => console.log("Changed user permissions"))
-        setCurList({...curList, "users": updatedUserList})
+            {"users": updatedUserList, "viewers": updatedViewerList, "editors": updatedEditList}, {merge: true}).then(() => console.log("Changed user permissions"))
+        setCurList({...curList, "users": updatedUserList, "viewers": updatedViewerList, "editors": updatedEditList})
         setSharedUser(updatedUserList[0])
         setSharedUserPerms(updatedUserList[0].perms)
     }
@@ -567,6 +577,7 @@ function SignedInApp(props) {
                             <option value="Edit">Edit</option>
                         </select>
                     }
+
                     {sharedUser.email !== curList.users[0].email && <button onClick={() => handleDeletePerson()}>Unshare</button>}
 
 

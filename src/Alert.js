@@ -6,15 +6,18 @@ function Alert(props) {
             {props.children}
             <div className="alert-buttons">
                 <button className={"alert-button alert-cancel"} type={"button"}
-                        onClick={props.onClose}>
-                    Cancel
+                        onClick={() => {
+                            props.onClose();
+                            props.onCancel(props.auth);
+                        }}>
+                    Sign Out
                 </button>
                 <button className={"alert-button alert-ok"} type={"button"}
                         onClick={() => {
                             props.onClose();
                             props.onOK();
                         }}>
-                    OK
+                    Done
                 </button>
             </div>
         </div>

@@ -47,7 +47,7 @@ const auth = getAuth();
 // Get to this later :/
 // const collectionName = "People-AuthenticationRequired"
 
-const collectionName = "MasterList"
+const collectionName = "MasterListWRules"
 const listName = "List"
 
 // const masterList = collection(db, "MasterList")
@@ -264,7 +264,7 @@ function SignedInApp(props) {
     const [showAlert, setShowAlert] = useState(false);
 
     function handleAlertOK() {
-        console.log('the frob should be blitzened here');
+        console.log("Finished with sharing alert.")
     }
 
     function toggleModal() {
@@ -302,10 +302,22 @@ function SignedInApp(props) {
     const [editingTitle, setEditingTitle] = useState(false)
 
     const [shareEmail, setShareEmail] = useState("")
+    const [newUserPerms, setNewUserPerms] = useState("Edit")
+
+    const [sharedUser, setSharedUser] = useState(undefined)
+    const [sharedUserPerms, setSharedUserPerms] = useState(undefined)
 
     if (loadingPage || masterLoadingPage) {
         return (<span><h2>Page is loading...</h2></span>);
     }
+
+    if (curList && !sharedUser) {
+        setSharedUser(curList.users[0])
+    }
+    if (sharedUser && !sharedUserPerms) {
+        setSharedUserPerms(sharedUser.perms)
+    }
+
 
     function handleNewItem() {
         const uniqueId = generateUniqueID()
@@ -351,13 +363,30 @@ function SignedInApp(props) {
             {
                 "id": uniqueId,
                 "title": curTitle,
+                "owner": props.user.uid,
+                "users": [{"email": props.user.email, "perms": "Edit"}]
             }).then(() => console.log("Added new list"));
         setCurTitle("")
-        setCurList({
+
+        let newCurList = {
             "id": uniqueId,
             "title": curTitle,
-        })
+            "owner": props.user.uid,
+            "users": [{"email": props.user.email, "perms": "Edit"}]
+        }
+
+        setCurList(newCurList)
         setAddingList(false)
+
+        // const uniqueId2 = generateUniqueID()
+        // setDoc(doc(db, collectionName, newCurList ? newCurList.id : masterListItems[0].id, listName, uniqueId2),
+        //     {
+        //         id: uniqueId,
+        //         text: "Sample Text!",
+        //         checked: false,
+        //         created: serverTimestamp(),
+        //         priority: 0
+        //     }).then(() => console.log("Added new item"));
     }
 
     function handleCancelAddList() {
@@ -367,8 +396,9 @@ function SignedInApp(props) {
 
     function handleListChange(e) {
         let dropd = document.getElementById("listItems");
-        let selectedId = dropd.options[dropd.selectedIndex].id;
-        setCurList({title: e.target.value, id: selectedId})
+        // let selectedList = dropd.options[dropd.selectedIndex];
+        let selectedList = masterListItems[dropd.selectedIndex];
+        setCurList({title: e.target.value, id: selectedList.id, owner: selectedList.owner, users: selectedList.users})
     }
 
     function handleDeleteList(){
@@ -379,9 +409,45 @@ function SignedInApp(props) {
 
     function handleShareEmail(){
 
+        if(shareEmail === ""){
+            return
+        }
+
+        let userList = curList.users
+        userList.push({"email": shareEmail, "perms": newUserPerms})
+
+        setDoc(doc(db, collectionName, curList.id),
+            {"users": userList}, {merge: true}).then(() => console.log("Shared with new user"))
+
+        setCurList({...curList, "users": userList});
+        setShareEmail("")
     }
 
-    // console.log(props.user.uid)
+    function handleChangeSharedUserPerms(e) {
+        const updatedUserList = curList.users.map((user) => user === sharedUser ? {...user, "perms": e.target.value} : user)
+        setDoc(doc(db, collectionName, curList.id),
+            {"users": updatedUserList}, {merge: true}).then(() => console.log("Changed user permissions"))
+        setCurList({...curList, "users": updatedUserList})
+        setSharedUserPerms(e.target.value)
+    }
+
+    function handleChangedSharedUser(){
+        let dropd = document.getElementById("sharedUser");
+        let selectedUser = curList.users[dropd.selectedIndex];
+
+        setSharedUser(selectedUser)
+        setSharedUserPerms(selectedUser.perms)
+    }
+
+    function handleDeletePerson() {
+        const updatedUserList = curList.users.filter((user) => user !== sharedUser)
+        setDoc(doc(db, collectionName, curList.id),
+            {"users": updatedUserList}, {merge: true}).then(() => console.log("Changed user permissions"))
+        setCurList({...curList, "users": updatedUserList})
+        setSharedUser(updatedUserList[0])
+        setSharedUserPerms(updatedUserList[0].perms)
+    }
+
 
     return (<div className={"body"}>
             <div className="title_card">
@@ -423,25 +489,6 @@ function SignedInApp(props) {
                         (isNarrow ? <FaPencilAlt/> : "Edit Title")}</button> </span>}
             </div>
 
-            <span id="loggedInButtons">
-                <BsPersonCircle onClick={toggleModal} size={isNarrow ? 30 : 40}/>
-                {/*<p>Signed in as {props.user.displayName || props.user.email}</p>*/}
-                {/*<button type="button" onClick={() => signOut(auth)}>Sign out</button>*/}
-                {/*{!props.user.emailVerified && <button type="button" onClick={verifyEmail}>Verify email</button>}*/}
-            </span>
-
-            {showAlert && <Alert onClose={toggleModal} onOK={handleAlertOK}>
-                <div id="alert_title">
-                    {<BsFillPersonPlusFill id="alert_icon" size={isNarrow ? 15 : 25}/>} <span id={isNarrow ? "alert_text_narrow" : "alert_text"}>Share with new users</span>
-                    <br/>
-                    <span><input id={isNarrow ? "add_user_narrow" : "add_user"} onChange={(e) => setShareEmail(e.target.value)}/></span>
-                    {isNarrow && <br/>}
-                    <span><button id={isNarrow ? "share_button_narrow" : "share_button"} onClick={() => handleShareEmail()}>{isNarrow ? <FiSend size={12}/> : "Send"}</button></span>
-
-                    <hr/>
-                </div>
-            </Alert>}
-
 
             {selectedItems && !loadingPage && <ButtonList
                 hideCompleted={hideCompleted}
@@ -465,7 +512,7 @@ function SignedInApp(props) {
                         <option value="priority_dn">Priority (3 to 0)</option>
                 </optgroup>
             </select></span>}
-            {listItems.length === 0 && <i>There is nothing in your list!</i>}
+            {listItems.length === 0 && <i> No tasks left!</i>}
             {!addingItem && <TaskList hideCompleted={hideCompleted} listItems={listItems} addingItem={addingItem}
                                       areYouSure={areYouSure} setAddingItem={setAddingItem}
                                       selectedItems={selectedItems} setSelectedItems={setSelectedItems}
@@ -477,7 +524,57 @@ function SignedInApp(props) {
             setCurText(event.target.value)
         }}/>
         <button type="button" id="add_item" name="add_item" onClick={handleNewItem}>Add</button></span>}
+        <span id="loggedInButtons">
+            <BsPersonCircle onClick={toggleModal} size={isNarrow ? 30 : 40}/>
+        </span>
+            {showAlert && <Alert onClose={toggleModal} onOK={handleAlertOK} onCancel={signOut} auth={auth}>
 
+                <div id="alert_title">
+                    <div>List Owner: {curList.users[0].email}</div>
+                    <hr/>
+                    {<BsFillPersonPlusFill id="alert_icon" size={isNarrow ? 15 : 25}/>} <span id={isNarrow ? "alert_text_narrow" : "alert_text"}>Share with new users</span>
+                    <br/>
+                    <input id={isNarrow ? "add_user_narrow" : "add_user"} onChange={(e) => setShareEmail(e.target.value)} value={shareEmail}/>
+                    {isNarrow && <br/>}
+                    <select name="newUserPerms" id="newUserPerms" onChange={e => setNewUserPerms(e.target.value)} value={newUserPerms}>
+                        <optgroup>
+                            <option value="Edit">Edit</option>
+                            <option value="View">View</option>
+                        </optgroup>
+                    </select>
+                    <button id={isNarrow ? "share_button_narrow" : "share_button"} onClick={() => handleShareEmail()}>{isNarrow ? <FiSend size={12}/> : "Send"}</button>
+
+                    <hr/>
+                    <span id={isNarrow ? "alert_text_narrow" : "alert_text"}>Shared With</span>
+                    <br/>
+
+
+                    <select name="sharedUser" id="sharedUser" onChange={() => handleChangedSharedUser()} value={sharedUser.email}>
+                        <optgroup>
+                            {curList.users.map((user) => <option value={user.email} id={user.email}
+                                                                 key={user.email}>{user.email}</option>)}
+                        </optgroup>
+                    </select>
+
+                    { sharedUserPerms === "Edit" ?
+                        <select name="sharedUserPerms" id="sharedUserPerms" onChange={e => handleChangeSharedUserPerms(e)} value={sharedUserPerms}>
+                            <option value="Edit">Edit</option>
+                            <option value="View">View</option>
+                        </select>
+                        :
+                        <select name="sharedUserPerms" id="sharedUserPerms" onChange={e => handleChangeSharedUserPerms(e)} value={sharedUserPerms}>
+                            <option value="View">View</option>
+                            <option value="Edit">Edit</option>
+                        </select>
+                    }
+                    {sharedUser.email !== curList.users[0].email && <button onClick={() => handleDeletePerson()}>Unshare</button>}
+
+
+                    <hr/>
+                    <p>Signed in as {props.user.displayName || props.user.email}</p>
+                    {!props.user.emailVerified && <button type="button" onClick={verifyEmail}>Verify email</button>}
+                </div>
+            </Alert>}
         </div>
     );
 }

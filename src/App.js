@@ -43,20 +43,9 @@ const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
 const auth = getAuth();
 
-// Get to this later :/
-// const collectionName = "People-AuthenticationRequired"
 
 const collectionName = "MasterListWRules"
 const listName = "List"
-
-// const masterList = collection(db, "MasterList")
-
-// setDoc(doc(db, "MasterList", listId, "List", id))
-
-// const taskList = collection(db, "List")
-// db.collection("MasterList").doc(ListId).collection("Tasks").doc(TaskId)
-// setDoc(doc(masterList, listId, taskList, )
-// q = query(tasksCollection)
 
 
 function App(props) {
@@ -152,20 +141,20 @@ function SignUp() {
 
 function ButtonList(props) {
     return (<div className="list">
-            {(!props.hideCompleted && props.areYouSure && props.listItems.length > 0 && !props.addingItem) &&
+            {(!props.hideCompleted && props.areYouSure && props.listItems && props.listItems.length > 0 && !props.addingItem) &&
                 <button type="button" id="show_uncompleted_button" name="show_uncompleted_button"
                         onClick={() => props.setHideCompleted(true)}>Hide Completed</button>}
-            {(props.hideCompleted && props.areYouSure && props.listItems.length > 0 && !props.addingItem) &&
+            {(props.hideCompleted && props.areYouSure && props.listItems && props.listItems.length > 0 && !props.addingItem) &&
                 <button type="button" id="show_uncompleted_button" name="show_uncompleted_button"
                         onClick={() => props.setHideCompleted(false)}>Show All Items</button>}
 
-            {props.selectedItems.length > 0 && !props.addingItem && props.areYouSure &&
+            {props.selectedItems && props.selectedItems.length > 0 && !props.addingItem && props.areYouSure &&
                 <button type="button" id="delete_button" name="delete_button"
                         onClick={() => props.setAreYouSure(false)}>Delete Selected</button>}
-            {props.selectedItems.length > 0 && !props.addingItem && !props.areYouSure &&
+            {props.selectedItems && props.selectedItems.length > 0 && !props.addingItem && !props.areYouSure &&
                 <button type="button" id="delete_button" name="delete_button" onClick={props.handleDeleteClick}>Confirm
                     Deletions</button>}
-            {props.selectedItems.length >= 0 && !props.addingItem && !props.areYouSure &&
+            {props.selectedItems && props.selectedItems.length >= 0 && !props.addingItem && !props.areYouSure &&
                 <button type="button" id="delete_button" name="delete_button"
                         onClick={() => props.setAreYouSure(true)}>Cancel</button>}
         </div>
@@ -175,17 +164,19 @@ function ButtonList(props) {
 function TaskList(props) {
     return (<div className={"list_body"}>
             {props.hideCompleted
-                ? props.listItems.map((item) => (item.checked === false) &&
+                ? props.listItems && props.listItems.map((item) => (item.checked === false) &&
                     <Item id={item.id} key={item.id} checked={item.checked} text={item.text}
                           handleToggleItemSelect={handleToggleItemSelect} listItems={props.listItems}
                           selectedItems={props.selectedItems} setSelectedItems={props.setSelectedItems}
-                          priority={item.priority} listId={props.listId}/>)
-                : props.listItems.map((item) => <Item id={item.id} key={item.id} checked={item.checked} text={item.text}
+                          priority={item.priority} listId={props.listId}
+                          user={props.user} editors={props.editors}/>)
+                : props.listItems && props.listItems.map((item) => <Item id={item.id} key={item.id} checked={item.checked} text={item.text}
                                                       handleToggleItemSelect={handleToggleItemSelect}
                                                       listItems={props.listItems} selectedItems={props.selectedItems}
                                                       setSelectedItems={props.setSelectedItems}
                                                       priority={item.priority}
-                                                      listId={props.listId}/>)}
+                                                      listId={props.listId}
+                                                       user={props.user} editors={props.editors}/>)}
             {!props.addingItem && props.areYouSure && <button type={"button"} id="item_button" name="item_button"
                                                               onClick={() => props.setAddingItem(true)}>Create New Item
                 +</button>}
@@ -198,47 +189,56 @@ function Item(props) {
     return (<span>
             <input aria-label={(props.name)} type="checkbox" id={props.id} name={props.name} value={props.value} checked={props.checked}
                    className="bigCheckbox" aria-checked={props.checked}
-                   onChange={() => props.handleToggleItemSelect(props.checked, props.selectedItems, props.setSelectedItems, props.id, props.listId)}/>
+                   onChange={() => props.handleToggleItemSelect(props.checked, props.selectedItems, props.setSelectedItems, props.id, props.listId, props.user.email in props.editors)}/>
             <span className={'item_text'}> {!props.checked ?
-                <input className={"item_text"} onChange={e => handleRenaming(e, props.id, props.listId)}
+                <input className={"item_text"} onChange={e => handleRenaming(e, props.id, props.listId, props.user.email in props.editors)}
                        defaultValue={props.text}
                        key={props.id} id={props.id}/>
                 : <input className={"item_text_done"} aria-disabled={"true"} disabled="disabled" defaultValue={props.text} key={props.id} id={props.id}
                          readOnly={true}/>} </span>
-            <button aria-label={(props.priority === 1) ? "low-priority, current priority" : "low-priority"} onClick={() => handlePriorityClick(1, props.id, props.priority, props.listId)} value={1}
+            <button aria-label={(props.priority === 1) ? "low-priority, current priority" : "low-priority"} onClick={() => handlePriorityClick(1, props.id, props.priority, props.listId, props.user.email in props.editors)} value={1}
                   className={1 > props.priority ? "unchecked" : "checked"} aria-pressed={(1 === props.priority) ? "true" : "false"}>!    </button>
-            <button aria-label={(props.priority === 2) ? "medium-priority, current priority" : "medium-priority"} onClick={() => handlePriorityClick(2, props.id, props.priority, props.listId)} value={2}
+            <button aria-label={(props.priority === 2) ? "medium-priority, current priority" : "medium-priority"} onClick={() => handlePriorityClick(2, props.id, props.priority, props.listId, props.user.email in props.editors)} value={2}
                   className={2 > props.priority ? "unchecked" : "checked"} aria-pressed={(2 === props.priority) ? "true" : "false"}   >!   </button>
-            <button aria-label={(props.priority === 3) ? "high-priority, current priority" : "high-priority"} onClick={() => handlePriorityClick(3, props.id, props.priority, props.listId)} value={3}
+            <button aria-label={(props.priority === 3) ? "high-priority, current priority" : "high-priority"} onClick={() => handlePriorityClick(3, props.id, props.priority, props.listId, props.user.email in props.editors)} value={3}
                   className={3 > props.priority ? "unchecked" : "checked"} aria-pressed={(3 === props.priority) ? "true" : "false"}   >!   </button>
             <br/><br/>
             </span>
     );
 }
 
-function handlePriorityClick(value, id, priority, listId) {
-    if (value === priority) {
-        setDoc(doc(db, collectionName, listId, listName, id),
-            {"priority": value - 1}, {merge: true}).then(() => console.log("Set new priority"))
+function handlePriorityClick(value, id, priority, listId, allowed) {
+    if(allowed){
+        if (value === priority) {
+            setDoc(doc(db, collectionName, listId, listName, id),
+                {"priority": value - 1}, {merge: true}).then(() => console.log("Set new priority"))
+        } else {
+            setDoc(doc(db, collectionName, listId, listName, id),
+                {"priority": value}, {merge: true}).then(() => console.log("Set new priority"))
+        }
     } else {
+        console.log("You are not allowed to edit priorities.")
+    }
+
+}
+
+function handleRenaming(e, id, listId, allowed) {
+    if(allowed){
         setDoc(doc(db, collectionName, listId, listName, id),
-            {"priority": value}, {merge: true}).then(() => console.log("Set new priority"))
+            {"text": e.target.value}, {merge: true}).then(() => console.log("Set new name"))
     }
 }
 
-function handleRenaming(e, id, listId) {
-    setDoc(doc(db, collectionName, listId, listName, id),
-        {"text": e.target.value}, {merge: true}).then(() => console.log("Set new name"))
-}
+function handleToggleItemSelect(checked, selectedItems, setSelectedItems, itemId, listId, allowed) {
+    if(allowed){
+        setDoc(doc(db, collectionName, listId, listName, itemId),
+            {"checked": !checked}, {merge: true}).then(() => console.log("Toggled item"))
 
-function handleToggleItemSelect(checked, selectedItems, setSelectedItems, itemId, listId) {
-    setDoc(doc(db, collectionName, listId, listName, itemId),
-        {"checked": !checked}, {merge: true}).then(() => console.log("Toggled item"))
-
-    if (selectedItems.includes(itemId)) {
-        setSelectedItems(selectedItems.filter(i => i !== itemId));
-    } else {
-        setSelectedItems([...selectedItems, itemId]);
+        if (selectedItems.includes(itemId)) {
+            setSelectedItems(selectedItems.filter(i => i !== itemId));
+        } else {
+            setSelectedItems([...selectedItems, itemId]);
+        }
     }
 }
 
@@ -246,15 +246,18 @@ function SignedInApp(props) {
     const [filterType, setFilterType] = useState("created_up")
     const [reverse, setReverse] = useState(false)
 
-    const masterq = query(collection(db, collectionName), where("users", "array-contains-any", [{email: props.user.email, perms:"Edit",}, {email: props.user.email, perms:"View",}]));
+    // const masterq = query(collection(db, collectionName), where("users", "array-contains-any", [{email: props.user.email, perms:"Edit",}, {email: props.user.email, perms:"View",}]));
+    // const masterq = query(collection(db, collectionName))
+    const masterq = query(collection(db, collectionName), where("viewers", "array-contains", props.user.email));
 
     const [masterListItems, masterLoadingPage] = useCollectionData(masterq);
 
     const [curList, setCurList] = useState(undefined)
-
     const isNarrow = useMediaQuery({maxWidth: 750})
 
     const [showAlert, setShowAlert] = useState(false);
+
+    const user = props.user;
 
     function handleAlertOK() {
         console.log("Finished with sharing alert.")
@@ -269,7 +272,7 @@ function SignedInApp(props) {
     }
 
     if (masterListItems && !curList) {
-        setCurList(masterListItems[0])
+        setCurList(masterListItems[0]);
     }
 
     const q = reverse ?
@@ -313,25 +316,33 @@ function SignedInApp(props) {
 
 
     function handleNewItem() {
-        const uniqueId = generateUniqueID()
-        setDoc(doc(db, collectionName, curList ? curList.id : masterListItems[0].id, listName, uniqueId),
-            {
-                id: uniqueId,
-                text: curText,
-                checked: false,
-                created: serverTimestamp(),
-                priority: 0
-            }).then(() => console.log("Added new item"));
+        if(curList.editors.contains(user.email)){
+            const uniqueId = generateUniqueID()
+            setDoc(doc(db, collectionName, curList ? curList.id : masterListItems[0].id, listName, uniqueId),
+                {
+                    id: uniqueId,
+                    text: curText,
+                    checked: false,
+                    created: serverTimestamp(),
+                    priority: 0
+                }).then(() => console.log("Added new item"));
 
-        setCurText("")
-        setAddingItem(false)
+            setCurText("")
+            setAddingItem(false)
+        } else {
+            console.log("You are not allowed to create new items.")
+        }
     }
 
     function handleDeleteClick() {
-        // noinspection JSCheckFunctionSignatures
-        selectedItems.forEach(id => deleteDoc(doc(db, collectionName, curList.id, listName, id)));
-        setSelectedItems([]);
-        setAreYouSure(true);
+        if(curList.editors.contains(user.email)) {
+            // noinspection JSCheckFunctionSignatures
+            selectedItems.forEach(id => deleteDoc(doc(db, collectionName, curList.id, listName, id)));
+            setSelectedItems([]);
+            setAreYouSure(true);
+        } else {
+            console.log("You are not allowed to delete items.")
+        }
     }
 
     function handleSortChange(e) {
@@ -344,9 +355,14 @@ function SignedInApp(props) {
     }
 
     function handleTitleChange(e, listId) {
-        setDoc(doc(db, collectionName, listId),
-            {"title": e.target.value}, {merge: true}).then(() => console.log("Set new name"))
-        setCurList({...curList, "title": e.target.value});
+        let curEditors = curList.editors
+        if(curEditors.includes(user.email)) {
+            setDoc(doc(db, collectionName, listId),
+                {"title": e.target.value}, {merge: true}).then(() => console.log("Set new name"))
+            setCurList({...curList, "title": e.target.value});
+        } else {
+            console.log("You are not allowed to change the title name.")
+        }
     }
 
     function handleAddList() {
@@ -392,51 +408,61 @@ function SignedInApp(props) {
     }
 
     function handleDeleteList(){
-        listItems.forEach((item) => deleteDoc(doc(db, collectionName, curList.id, listName, item.id)));
-        deleteDoc(doc(db, collectionName, curList.id)).then(() => console.log("Deleted List"))
+        if(user.uid === curList.owner){
+            listItems.forEach((item) => deleteDoc(doc(db, collectionName, curList.id, listName, item.id)));
+            deleteDoc(doc(db, collectionName, curList.id)).then(() => console.log("Deleted List"))
 
-        setReadyDeleteList(true)
-        setCurList(masterListItems[0])
-
+            setReadyDeleteList(true)
+            setCurList(masterListItems[0])
+        } else {
+            console.log("You are not allowed to delete this list.")
+        }
     }
 
     function handleShareEmail(){
+        if(curList.editors.contains(user.email)) {
+            if(shareEmail === ""){
+                return
+            }
 
-        if(shareEmail === ""){
-            return
+            let userList = curList.users
+            let viewList = curList.viewers
+            let editList = curList.editors
+
+            userList.push({"email": shareEmail, "perms": newUserPerms})
+            viewList.push(shareEmail)
+            if(newUserPerms === "Edit"){
+                editList.push(shareEmail)
+            }
+
+            setDoc(doc(db, collectionName, curList.id),
+                {"users": userList, "viewers": viewList, "editors": editList}, {merge: true}).then(() => console.log("Shared with new user"))
+
+            setCurList({...curList, "users": userList, "viewers": viewList, "editors": editList});
+            setShareEmail("")
+        } else {
+            console.log("You are not allowed to share this list with others.")
         }
-
-        let userList = curList.users
-        let viewList = curList.viewers
-        let editList = curList.editors
-
-        userList.push({"email": shareEmail, "perms": newUserPerms})
-        viewList.push(shareEmail)
-        if(newUserPerms === "Edit"){
-            editList.push(shareEmail)
-        }
-
-        setDoc(doc(db, collectionName, curList.id),
-            {"users": userList, "viewers": viewList, "editors": editList}, {merge: true}).then(() => console.log("Shared with new user"))
-
-        setCurList({...curList, "users": userList, "viewers": viewList, "editors": editList});
-        setShareEmail("")
     }
 
     function handleChangeSharedUserPerms(e) {
-        const updatedUserList = curList.users.map((user) => user === sharedUser ? {...user, "perms": e.target.value} : user)
+        if(user.uid === curList.owner) {
+            const updatedUserList = curList.users.map((curUser) => curUser === sharedUser ? {...curUser, "perms": e.target.value} : curUser)
 
-        let updatedEditList = curList.editors
-        if(e.target.value === "View"){
-            updatedEditList = curList.viewers.filter((user) => user !== sharedUser)
+            let updatedEditList = curList.editors
+            if(e.target.value === "View"){
+                updatedEditList = curList.viewers.filter((curUser) => curUser !== sharedUser)
+            } else {
+                updatedEditList.push(shareEmail)
+            }
+
+            setDoc(doc(db, collectionName, curList.id),
+                {"users": updatedUserList, "editors": updatedEditList}, {merge: true}).then(() => console.log("Changed user permissions"))
+            setCurList({...curList, "users": updatedUserList, "editors": updatedEditList})
+            setSharedUserPerms(e.target.value)
         } else {
-            updatedEditList.push(shareEmail)
+            console.log("You are not allowed to change this user's permissions.")
         }
-
-        setDoc(doc(db, collectionName, curList.id),
-            {"users": updatedUserList, "editors": updatedEditList}, {merge: true}).then(() => console.log("Changed user permissions"))
-        setCurList({...curList, "users": updatedUserList, "editors": updatedEditList})
-        setSharedUserPerms(e.target.value)
     }
 
     function handleChangedSharedUser(){
@@ -448,14 +474,19 @@ function SignedInApp(props) {
     }
 
     function handleDeletePerson() {
-        const updatedUserList = curList.users.filter((user) => user !== sharedUser)
-        const updatedViewerList = curList.viewers.filter((user) => user !== sharedUser)
-        const updatedEditList = curList.editors.filter((user) => user !== sharedUser)
-        setDoc(doc(db, collectionName, curList.id),
-            {"users": updatedUserList, "viewers": updatedViewerList, "editors": updatedEditList}, {merge: true}).then(() => console.log("Changed user permissions"))
-        setCurList({...curList, "users": updatedUserList, "viewers": updatedViewerList, "editors": updatedEditList})
-        setSharedUser(updatedUserList[0])
-        setSharedUserPerms(updatedUserList[0].perms)
+
+        if(user.uid === curList.owner || sharedUser.email === user.email) {
+            const updatedUserList = curList.users.filter((curUser) => curUser !== sharedUser)
+            const updatedViewerList = curList.viewers.filter((curUser) => curUser !== sharedUser)
+            const updatedEditList = curList.editors.filter((curUser) => curUser !== sharedUser)
+            setDoc(doc(db, collectionName, curList.id),
+                {"users": updatedUserList, "viewers": updatedViewerList, "editors": updatedEditList}, {merge: true}).then(() => console.log("Changed user permissions"))
+            setCurList({...curList, "users": updatedUserList, "viewers": updatedViewerList, "editors": updatedEditList})
+            setSharedUser(updatedUserList[0])
+            setSharedUserPerms(updatedUserList[0].perms)
+        } else {
+            console.log("You are not allowed to unshare this user.")
+        }
     }
 
 
@@ -472,7 +503,7 @@ function SignedInApp(props) {
                     </span>
                     : <span id="titleEditors">
                         <button onClick={() => setAddingList(true)}>{isNarrow ? "+" : "Create New List +"}</button>
-                        {masterListItems.length > 1 && <button onClick={()=>setReadyDeleteList(false)}>{isNarrow ? <FaTrashAlt/> : "Delete Current List"}</button>}
+                        {masterListItems && masterListItems.length > 1 && <button onClick={()=>setReadyDeleteList(false)}>{isNarrow ? <FaTrashAlt/> : "Delete Current List"}</button>}
                     </span>
                 } </span>
                 :
@@ -486,9 +517,9 @@ function SignedInApp(props) {
                         <h2><input type={"text"} defaultValue={curList.title} id="titleText"
                                    onChange={(e) => handleTitleChange(e, curList.id)}/></h2>
                         : <h2><select name="listItems" id="listItems" onChange={(e) => handleListChange(e)}
-                                      value={curList.title}>
+                                      value={curList ? curList.title : "Your TODO List"}>
                             <optgroup>
-                                {masterListItems.map((list) => <option value={list.title} id={list.id}
+                                {masterListItems && masterListItems.map((list) => <option value={list.title} id={list.id}
                                                                        key={list.id}>{list.title}</option>)}
                             </optgroup>
                         </select></h2>} </span>}
@@ -508,9 +539,11 @@ function SignedInApp(props) {
                 setHideCompleted={setHideCompleted}
                 selectedItems={listItems ? listItems.filter(item => item.checked) : []}
                 setAreYouSure={setAreYouSure}
-                handleDeleteClick={handleDeleteClick}/>}
+                handleDeleteClick={handleDeleteClick}
+                user={user}
+                editors={curList ? curList.editors : []}/>}
 
-            {(areYouSure && !addingItem && listItems.length > 0) &&
+            {(areYouSure && !addingItem && listItems && listItems.length > 0) &&
                 <span className={"filter"}><label htmlFor="filter"> Sorting by: </label>
             <select name="filter" id="filter" onChange={e => handleSortChange(e)} value={filterType}>
                 <optgroup>
@@ -522,11 +555,12 @@ function SignedInApp(props) {
                         <option value="priority_dn">Priority (3 to 0)</option>
                 </optgroup>
             </select></span>}
-            {listItems.length === 0 && <i> No tasks left!</i>}
+            {listItems && listItems.length === 0 && <i> No tasks left!</i>}
             {!addingItem && <TaskList hideCompleted={hideCompleted} listItems={listItems} addingItem={addingItem}
                                       areYouSure={areYouSure} setAddingItem={setAddingItem}
                                       selectedItems={selectedItems} setSelectedItems={setSelectedItems}
-                                      listId={curList ? curList.id : masterListItems[0].id}/>}
+                                      listId={curList ? curList.id : masterListItems ? masterListItems[0].id : "1"}
+                                      user={user} editors={curList ? curList.editors : []}/>}
             {addingItem && <span className={"item_enter"}>
         <label htmlFor="item_enter"> Enter new item text:</label>
         <br/>

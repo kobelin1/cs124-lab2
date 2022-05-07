@@ -2,59 +2,51 @@
 # CS124 Lab 4 Design Document
 #### Team Members: Roman Herrera and Kobe Lin
 
-
 ## Design Decisions
 
 Similar to all previous labs, we wanted to keep our overall style and design of our lists this same. This is to stay in line with our goal of making our to-do lists look clean and simple. 
 
-One of the first changes we made was to how the priority icons looked. Initially, we had it so that the selected ones are black, while the unselected ones are a light gray. We wanted to add more contrast to the icons so that its easier for people with lower vision to see. As such, we decided to make exclamation points that are selected to be bright red, while unselected ones are a lighter grey. We felt this choice would help differentiate between them. Furthermore, we chose to space out the exclamation points more to similarly help differentiate them.
-![prioritybuttons.png](https://www.dropbox.com/s/euzunbq0w8bt4z6/prioritybuttons.png?dl=0&raw=1)
+One of the first changes we made was adding a share menu.
+
+![sharemenu.png](https://www.dropbox.com/s/jqnposbcerl3hss/Screen%20Shot%202022-05-06%20at%206.34.59%20PM.png?dl=0&raw=1) 
+
+We wanted to mimic Google Docs' approach with their pop-up menu that contains all of the functionality. Due to space constraints on the actual lists as well, it made sense to have all of the sharing / user permissions / verification to be condensed into one small but clear button. We opted to use a lot of dropdowns in the alert since the pop-up was not that large, and it is possible that lists are shared with multiiple users. Additionally, we felt that users would likely be familiar with this as it is similar to Google's implementation and would therefore feel comfortbale with such a design. We chose to allow users to be either editors or viewers, since we felt that the list owner should be able to restrict certain users (such as young children perhaps) from changing lists.
+
+Another design decision we made was how to perform authentication. 
+
+![Screen Shot 2022-05-06 at 9.29.51 PM.png](https://www.dropbox.com/s/ox95vaohnlb8xxn/Screen%20Shot%202022-05-06%20at%209.29.51%20PM.png?dl=0&raw=1)
+
+We opted to have a startup page that would require users to sign in first, with a line breakng up the sign portion and the sign up portion. We felt that users would not want a long tedious process to sign in to see their lists, and as such, we tried to make the entire design as simple and quick as possible. The centered-aligned text helps to focus the users straight to where they need to input text and continue on. Lastly, we really wanted to ensure that users could retain access of their accounts if their account was hacked, taken, or they simply forogt their password. As such, we made sure to implement a way for users to recover their password using only their email. When users sign in for the first time, they will be provided two TODO lists to start with. While one might seem to be more intuitive, we wanted users to know that they can have multiple lists and thus prompt them to use the full capabilties of the application.  
 
 
-Another design decision we made was how to display multiple task lists. In the end, we chose to have it so that the title of the task list is also a drop down that shows the user's other task lists. From this decision, we had a subsequent decision to have an "Edit Title" button in order to change the name of the task list. From here, we made the decision to also have the "Create New List +" and "Delete Current List" up at the top of the page. This is so that all of our functional buttons and inputs related to task lists as a whole all reside in one area. 
-
-![tasklistbuttons.png](https://www.dropbox.com/s/en6q0hot9emud0s/tasklistbuttons.png?dl=0&raw=1)
-
-When it came to accesibility labels, we wanted to convey labels and info in as little words as possible, such as only having the highest priority level be labeled as "selected", so that there would not be too much information thrown at the user at once. 
+Lastly, a lot of design decisions were focused on the rules we wanted to enforce. We opted to go for a slightly more lax approach for viewing, but stricter for editing. List owners were given full functionality, such as changing other user permissions, removing users, and editing tasks, without needing to verify themselves. Our belief was that users can do whatever they want with their own lists and as such, should not be limited there. Users that were only given a view permission can only do that. Since the view mode is meant for the list owner to give very limit viewing of the list, we wanted to enforce this as much as possible. Viewers, as such, cannot alter anyhting about the lists or the tasks within them. Editors are a bit more tricky though. We understood that verification is important, yet people may not know to verify their emails before editing. We ended up deciding to essentially make non-verified editors viewers until they could verify their account. However, to help clear that up, unverified users would be prompted with an alert every time that they tried to make an edit. We felt that verified editors should be full collaborators of that list since the list owner explicitly gave them edit access over viewing access, so we gave them the majority of all functonality. They can edit tasks, share with users, edit user permissions, and remove other users. However, they cannot delete the list for everyone; only the owner can do that. Overall, we tried to be as lenient as possiible to give users as much functionality, while still maintaining some form of security and restrictions.
 
 ## Alternative Designs
-We had various alternate designs, most of them related to the task list functionality.  
+We had pretty mimimal alternate designs for the new features we added in this lab. Both of us found our design for authentication to be the most straightforward. However, the main alternate deisgn we considered was placement for the person icon, and how much stuff should be in the alert. 
 
-##### 1. Exclamation Points
-We had various alternate designs that we were considering when deciding how exactly our exclamation point icons should look. They can be seen in the image below:
+##### 1. Person Icon
+We considered having the person icon in the title bar area to the right of the edit title button so the white space could stay entirely about the tasks.
 
-![alternateprioritybuttons.jpg](https://www.dropbox.com/s/q2u68ye7uvvs8o4/alternateprioritybuttons.jpg?dl=0&raw=1)
+![IMG_7C4194DCE8F0-1.jpeg](https://www.dropbox.com/s/aicfb1u2sej9bv8/IMG_7C4194DCE8F0-1.jpeg?dl=0&raw=1)
 
-In the end, we settled upon our current design as we felt that it was the cleanest, and didn't rely on using images or other packages to get the icon itself. Furthermore, we felt the red would bring the most contrast compared to both the light gray unselected icons and the white background. 
+However, we opted for our current design where it is lower and in the white space because we felt that the title bar was getting too cramps, and the same arugment about having that space being dedicated for upper list level changes was applied. Overall, we just felt our current design was also cleaner.
 
-##### 2. Hamburger Icon
-We had an alternate design for our "Create New List+" and "Delete Current List" buttons where they were held inside of a hamburger dropdown, in which the user would have to click the hamburger first in order to get access to those functionality buttons. We felt that this would make our button layout look cleaner, but felt that it was not worth the tradeoff of extra clicks needed to get to it. 
+##### 2. User information outside of share menu
 
-![hamburgericon.jpg](https://www.dropbox.com/s/8x0mc7l3kmfgl13/hamburgericon.jpg?dl=0&raw=1)
+We considered having more information displayed on screen about the user, such as their email that they are signed in with, and list information such as the owner of the list. 
 
-##### 3. Title centering
-We had an alternate design where our title was better centered and spaced with the buttons. This is actually what we ideally wanted our design to look like; however, we were unable to get it to work, so we settled on our current design. 
+![IMG_28A8012B944F-1.jpeg](https://www.dropbox.com/s/zw9zbmx8iinue4q/IMG_28A8012B944F-1.jpeg?dl=0&raw=1)
 
-##### 4. Text box title and separate dropdown selection
-Another alternate design we had was to make the title permanently a textbox and have a separate dropdown button that would hold all the other todo lists. However, we found some issues with having this design. One was that we felt it did not look good to have a permanent text box as this would leave a big white rectangle in the middle of our orange header. Secondll, it was not super clear that the title could be clicked and edited as there was no icon or indicator of any sort. Lastly, we also did not like the look of having the drop down be off to the side.
-
-![textboxtitle.jpg](https://www.dropbox.com/s/hclamgife2hlssw/textboxtitle.jpg?dl=0&raw=1)
-
-##### 5. Home page of lists
-Our last design that we'd considered was having a "home page" that linked to each of the separate to do lists. We did not like this idea as we felt we want users to immediately be able to switch between to-do lists without having to go back a page and into a new page in order to switch between to do lists. Furthemore, we felt that the design would be cleaner if everything was handled in one singular "page". 
+However, we opted for our current design where all of the information is within the share menu. We felt that this alternate design cluttered the main page far too much, especially near the row of buttons right under the title bar. Additionally, we felt that users would not really care to see this information all of the time, but would rather see more of their acutal list. We also found that most of the time when this information was relevant, it would be when using functionality found in the share menu. Therefore, we found that just keeping this information inside the share menu was best for clarity and simplicity.
 
 ## User Testing
 
-We performed user testing at three stages during our design. We initially asked users about accessibility and responsive design, and what they felt we could improve on, prior to making any significant functional changes. Most commented on the exclamation marks that signify priority being difficult to see, as they were a small font size. Furthermore, the difference between a checked and unchecked exclamation mark was stated to be too minimal, especially for those with worse eyesight. To account for this issues, we made checked exclamation marks to be bigger (helpful for colorblind users) and a bright red as opposed to the faded out black for unchecked marks.
-
-During the second stage, after adding most new functionality, we again checked for accessibility and responsiveness. Most users were satisfied with the changes, but a few noted that on Chrome, the select dropdown element’s arrow was small. However, we could not find a solution for this, as it’s built in into the select item so there was not a trivial solution. Interestingly, it is much larger on Safari so it seems to be browser-based.
-
-During the last stage of testing, we were looking for overall functionality, including responsiveness and accessibility. Most users were able to navigate through the webpage using keyboard actions and using the mouse. Only one user complained that the priority exclamation marks were unintuitive (he expected it to cycle from 0-4 instead of being able to choose a specific priority), however, this has been noted in prior testing and was considered as an alternate design prior.
+We performed user testing at the very end since performing user testing with varying amounts of rules and features seemed less productive. We had the users focus on the authentication and sharing features the most. They found most of the design intuitive since most are comfortable with Google's design as well (this was explicitly mentioned by one user). There were very small errors that were found through this process, such as user permissions sometimes changing, but sometimes not. However, an error all of the users found was that when creating a new list, they had to refresh to actually start making edits, since the rules prevented them from reading the new list they created for some reason. This was a major issue since every user will be making new lists. To fix this, we had to acutally loosen the rules for reading of tasks which may make it less secure now, but since it is for tasks, and is only reading, we felt comfortable making this change.
 
 ## Final Design
-![homepage2.png](https://www.dropbox.com/s/ljtk88qazfta8zj/homepage2.png?dl=0&raw=1)
+![Screen Shot 2022-05-06 at 10.15.55 PM.png](https://www.dropbox.com/s/gqlo1uwr2sskfl1/Screen%20Shot%202022-05-06%20at%2010.15.55%20PM.png?dl=0&raw=1)
 
-Our final design is shown in the image above. We have two "functionality" buttons at the top ("Hide Completed" and "Delete Selected"), put the sorting functionality right below it, put the body of the list at the center, and a button at the bottom to create a new list item. A flow for each of the functionalities would be as follows: 
+Our final design is shown in the image above. We have two "functionality" buttons at the top ("Hide Completed" and "Delete Selected"), put the sorting functionality right below it, put the body of the list at the center, and a button at the bottom to create a new list item. A person icon in the top right under the title bar leads to the share menu which contains many functions. A flow for each of the functionalities would be as follows: 
 
 ##### 1. Edit Items
 If a user wants to edit an item, they can click into a text box and edit the list item.
@@ -151,19 +143,45 @@ Clicking the "Confirm Deletion of Current List" button will cause the current li
 
 ![lab4deletelistpost.png](https://www.dropbox.com/s/te4k4t9fxik4ysl/lab4deletelistpost.png?dl=0&raw=1)
 
+##### 11. Share menu
+Click the person icon to open the menu. It contains all the information regarding ownership, permissions, and shared users.
+
+![Screen Shot 2022-05-06 at 6.43.06 PM.png](https://www.dropbox.com/s/jg6ahojudqo7f9p/Screen%20Shot%202022-05-06%20at%206.43.06%20PM.png?dl=0&raw=1)
+
+This menu will pop up, prompting the user with various functions. At the top, the list ownwer is shown. Just under that is the section to share the list with new users. Beneath that is the section to find current users and their permissions. Then, the current user is displayed, and if the email if not verified, then a verification button is shown which sends a verification email to the email when clicked. At the very bottom is a done button that closes the pop-up and a Sign Out button that signs the current user out.
+
+![sharemenu.png](https://www.dropbox.com/s/jqnposbcerl3hss/Screen%20Shot%202022-05-06%20at%206.34.59%20PM.png?dl=0&raw=1)
+
+##### 12. Share menu - Sharing with new users
+Type into the first input box to enter the email of the user you want to share with. There is a dropdown to choose the permissions you wish to give to the new user. Note that only the document owner or verified editors can share the list with others. Hitting send will share the list with the assossicated email.
+
+![Screen Shot 2022-05-06 at 8.12.36 PM.png](https://www.dropbox.com/s/look5n6vnzkshmu/Screen%20Shot%202022-05-06%20at%208.12.36%20PM.png?dl=0&raw=1)
+
+##### 13. Share menu - Users already shared with
+Click the dropdown underneath "Shared With" to see a list of all users that the document is shared with.
+
+![Screen Shot 2022-05-06 at 8.16.01 PM.png](https://www.dropbox.com/s/19bfv6171digqn8/Screen%20Shot%202022-05-06%20at%208.16.01%20PM.png?dl=0&raw=1)
+
+After choosing one, the other dropdown to the right will reflect their current permissions (Edit or View). Using this dropdown, you can change that specific user's permissions, as long as you are the list's owner. There will also be an unshare button, that if clicked, will remove that user from the list. Note that this will not appear next to the owner and the owner and verified editors can perform this action.
+
+![Screen Shot 2022-05-06 at 8.16.36 PM.png](https://www.dropbox.com/s/pjwn3r3o4sclism/Screen%20Shot%202022-05-06%20at%208.16.36%20PM.png?dl=0&raw=1)
+
+#### 14. Authentication
+In order to see any task lists, users must first sign in if they have an account or sign up if they do not. If a user forgot their password, they can enter their email in the text box next to the send reset email and then click that button to an email to reset the passsword.
+
+![Screen Shot 2022-05-06 at 9.29.51 PM.png](https://www.dropbox.com/s/ox95vaohnlb8xxn/Screen%20Shot%202022-05-06%20at%209.29.51%20PM.png?dl=0&raw=1)
+
 ## Challenges Faced
 
-One big challenge we faced came from working with the styling of our page. There were many times where the styling would be thrown off, or wouldn't look how we really wanted them to. For some stuff, we had to leave things be as we were struggling to get things to look exactly as we wanted. For example, we wanted some more paddings on the top functional paddings around the title of our todo list. Another challenge we faced came from making our page more accessibility friendly. Especially for screen-reader related things, we found a lot of difficulty in getting proper labels and names for things on our page. We would sometimes encounter situations where there would be lots of extra words and labels that we didn't want; we had to dig through and find what was causing this and delete it or rename things. Another challenge we encountered was overhauling our database to accomodate for multiple task lists. There were many different bugs and errors that came up during our process of integrate in the multiple task lists that needed to be fixed and dealt with. We slowly worked through these issues though by iterating through each function and making sure it works.
+The biggest challenged face was acutally working with our old code. We have been using one large code file for everything despite knowing separating code was more effective. Additionally, sloppy coding practices and large lengthy statement made the code even more difficult to use. When we were trying to make sure on the front end that rules were being followed, it was getting difficult to track issues but also where variables needed to be passed on / where their scope was. Debugging this lab was by far the hardest out of all the labs and there was unforutanely a lot of it. Therefore, our biggest challenge was jsut working with a poorly made codebase. We did not have a good solution, since the solution would have been to write cleaner code from the start and we did not want to completely redo our project. 
+
+The second biggest challenge was the rules. Whether we were breaking some permissions or completely passing them, the program wouldd throw out random undefined errors. For instance, we made the document readable if the user was signed in and was a viewer. This would crash the program and we would not understand why since we checked that this should be valid. This issue extended to all of the capabilities and not just read, so we were very confused. However, the issue was that we were using a wildcard in our path so it would also go one level deeper and find the tasks which did not have the correct data to check for ownership or viewership. Switching this and adding more error handling allowed us to resolve this issue.
 
 ## Designs Most Proud Of
 
-One design we were proud of was the changes we made to try and be more accomodating to accesibility, such as the color and sizing of the exclamation points or fixing around the font sizes around the page. We were especially proud as we felt that we were able to keep the overall "simple" look of our page that we want, but still adjusted to fit these changes. 
+We were most proud of the design for the share menu. We found that the alert style appraoch was far better than any other, and we impressed ourselves by being able to make it and contain a signficant amount of information all within it. We were partically excited by our dropdown functions to display all of the users. We found that this was a very elegant approach that was still intituive for users and saved on space, which can get very limited on mobile. We were also pleased that we were able to change the displayed value of the user permissions depending on the user selected to the left. This took a clever solution since dropdowns are not easily manipulated in our experience.
 
-Another design we were proud of were the buttons at the top of the task list. For one, we were able to get it to be responsive to the size of the window. When the window is large and full sized, the buttons expand out to have the full text on them such as "Create New List +" or "Delete Current List". However, as the window size shrinks, the buttons change to have icons that are related to the function of the button. 
-
-Another design we liked was how we handled the multiple task lists. We like the look of how all of our lists are contained in the drop down, and makes it easy to switch between the lists. Furthermore, having it not constantly be a textbox makes the overall header look better as it doesn't have a large white box along it. 
-
-## Links to videoes
+## Links to videos for Lab 4
 
 ##### 1. Using application fully from the keyboard
 https://youtu.be/RweT6hM959o

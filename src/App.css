@@ -5,7 +5,7 @@
 .body {
   background-color: white;
   display: grid;
-  grid-template-columns: 85px 85px 85px 1fr;
+  grid-template-columns: 85px 85px 85px 1fr ;
   grid-template-rows: 70px 70px 45px 1fr 1fr;
 }
 
@@ -196,15 +196,42 @@ optgroup {
   grid-column: 1;
 }
 
-/*#editTitle{*/
-/*  width: 35px;*/
-/*  height: 35px;*/
-/*}*/
-
-#createList{
-
+#email{
+  text-align: center;
 }
 
-#deleteList{
+#loggedInButtons{
+  position:absolute;
+  top: 80px;
+  right: 6%;
+}
 
+#alert_title{
+  text-align: center;
+}
+
+#alert_text{
+  font-size: 30px;
+}
+
+#alert_text_narrow{
+  font-size: 17px;
+}
+
+#add_user{
+  width:  65%;
+  height: 20px;
+  font-size: 18px;
+}
+
+#add_user_narrow{
+  width: 80%
+}
+
+#signin_text {
+  text-align: center;
+}
+
+#signup_text {
+  text-align: center;
 }

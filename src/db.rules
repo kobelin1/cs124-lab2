@@ -1,0 +1,85 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth.uid != null;
+    }
+
+    function isDocOwner() {
+      return request.auth.uid == resource.data.owner;
+    }
+
+    function isViewer() {
+    	return request.auth.token.email in resource.data.viewers;
+    }
+
+    function isEditor() {
+    	return request.auth.token.email in resource.data.editors;
+    }
+
+    function updatedDocHasCorrectOwner() {
+      return request.auth.uid == request.resource.data.owner;
+    }
+
+    function isVerified() {
+    	return request.auth.token.email_verified
+    }
+
+    function unsharedSelf() {
+    	return request.auth.email in resource.data.viewers &&
+      (request.auth.email in request.resource.data.viewers)
+    }
+
+    // Allows for previous projects to work
+    match /List/{List=**} {
+      allow read, write: if true;
+    }
+
+    // Allows for previous projects to work
+    match /MasterList/{List=**} {
+      allow read, write: if true;
+    }
+
+    // Rules for Lab 5, note that each document there exists a viewers
+    // list and an editors list, and editors is a subset of viewers
+    match /MasterListWRules/{ListId} {
+
+      // Users can only view lists that they are a viewer (sharing adds users to viewers list)
+      allow read: if signedIn() && isViewer();
+
+      // Users can create any list so long as they are the owner
+      allow create: if signedIn() && updatedDocHasCorrectOwner();
+
+      // Only the owner or verified editors can change the list title, users who it is shared with,
+      // and user permissions
+      allow update: if signedIn() && ((isDocOwner() || (isEditor() && isVerified())));
+
+      // Only list owners can delete their own list
+      allow delete: if signedIn() && isDocOwner();
+
+      match /List/{task} {
+
+          function sublevelIsDocOwner() {
+            return request.auth.uid == get(/databases/$(database)/documents/MasterListWRules/$(ListId)).data.owner;
+          }
+
+          function sublevelIsViewer() {
+            return request.auth.token.email in get(/databases/$(database)/documents/MasterListWRules/$(ListId)).data.viewers;
+          }
+
+          function sublevelIsEditor() {
+            return request.auth.token.email in get(/databases/$(database)/documents/MasterListWRules/$(ListId)).data.editors;
+          }
+
+          // Anyone signed in can read the tasks. Wanted to add a rule about also being a viewer but this created
+          // issues when new lists were created. Since users can only see lists which they are a viewer for, this
+          // seems reasonable still.
+          allow read: if signedIn();
+
+          // Tasks can be created, updated, or deleted by the owner and any verified editor
+          allow create, update, delete: if signedIn() && (sublevelIsDocOwner() || (sublevelIsEditor() && request.auth.token.email_verified));
+      }
+    }
+  }
+}

@@ -394,10 +394,9 @@ function SignedInApp(props) {
             if (curList.editors.includes(user.email)){
                 alert("You need to verify your email before editing.")
             } else {
-                alert("You are not allowed to change this user's permissions.")
+                alert("You are not allowed to create new items.")
             }
 
-            alert("You are not allowed to create new items.")
         }
     }
 
@@ -411,10 +410,8 @@ function SignedInApp(props) {
             if (curList.editors.includes(user.email)){
                 alert("You need to verify your email before editing.")
             } else {
-                alert("You are not allowed to change this user's permissions.")
+                alert("You are not allowed to delete items.")
             }
-
-            alert("You are not allowed to delete items.")
         }
     }
 
@@ -437,10 +434,8 @@ function SignedInApp(props) {
             if (curList.editors.includes(user.email)){
                 alert("You need to verify your email before editing.")
             } else {
-                alert("You are not allowed to change this user's permissions.")
+                alert("You are not allowed to change the title name.")
             }
-
-            alert("You are not allowed to change the title name.")
         }
     }
 
@@ -497,10 +492,8 @@ function SignedInApp(props) {
             if (curList.editors.includes(user.email)){
                 alert("You need to verify your email before editing.")
             } else {
-                alert("You are not allowed to change this user's permissions.")
+                alert("You are not allowed to delete this list.")
             }
-
-            alert("You are not allowed to delete this list. You may need to verify your email first.")
         }
     }
 
@@ -529,10 +522,10 @@ function SignedInApp(props) {
             if (curList.editors.includes(user.email)){
                 alert("You need to verify your email before editing.")
             } else {
-                alert("You are not allowed to change this user's permissions.")
+                alert("You are not allowed to share this list with others.")
             }
 
-            alert("You are not allowed to share this list with others. You may need to verify your email first.")
+
         }
     }
 

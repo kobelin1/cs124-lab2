@@ -228,3 +228,10 @@ optgroup {
   width: 80%
 }
 
+#signin_text {
+  text-align: center;
+}
+
+#signup_text {
+  text-align: center;
+}

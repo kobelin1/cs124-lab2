@@ -16,12 +16,14 @@ import {
     useAuthState,
     useCreateUserWithEmailAndPassword,
     useSignInWithEmailAndPassword,
-    useSignInWithGoogle
+    useSignInWithGoogle,
+
 } from 'react-firebase-hooks/auth';
 
 import {
     getAuth,
     sendEmailVerification,
+    sendPasswordResetEmail,
     signOut } from "firebase/auth";
 
 import {useMediaQuery} from 'react-responsive';
@@ -78,6 +80,7 @@ function SignIn() {
     ] = useSignInWithGoogle(auth);
     const [email, setEmail] = useState("");
     const [pw, setPw] = useState("");
+    const [recoveryEmail, setRecoveryEmail] = useState("")
 
     if (user1 || user2) {
         // Shouldn't happen because App should see that
@@ -86,9 +89,11 @@ function SignIn() {
     } else if (loading1 || loading2) {
         return <p>Logging in…</p>
     }
-    return <div>
+
+    return <div id="signin_text">
         {error1 && <p>"Error logging in: " {error1.message}</p>}
         {error2 && <p>"Error logging in: " {error2.message}</p>}
+        <br/>
         <label htmlFor='email' id='email_label'>email: </label>
         <input type="text" id='email' value={email}
                onChange={e=>setEmail(e.target.value)}/>
@@ -103,8 +108,29 @@ function SignIn() {
         <button onClick={() => signInWithGoogle()}>
             <FcGoogle/> Sign in with Google
         </button>
+        <br/><br/>
+        <p>Forgot Password? Enter your email below and click "Send Reset Email"</p>
+        <input type="text" id='recoveryEmail' value={recoveryEmail}
+               onChange={e=>setRecoveryEmail(e.target.value)}/>
+        <button onClick={() => resetPassword(auth, recoveryEmail, setRecoveryEmail)}>Send Reset Email</button>
+        <br/><br/>
         <hr/>
+        <br/>
     </div>
+}
+
+function resetPassword(auth, email, setRecoverEmail){
+    sendPasswordResetEmail(auth, email)
+        .then(() => {
+            alert('Please check your email...')
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.log(errorCode)
+            console.log(errorMessage)
+        });
+    setRecoverEmail("")
 }
 
 function SignUp() {
@@ -122,7 +148,7 @@ function SignUp() {
     } else if (loading) {
         return <p>Signing up…</p>
     }
-    return <div>
+    return <div id={"signup_text"}>
         {error && <p>"Error signing up: " {error.message}</p>}
         <label htmlFor='email'>email: </label>
         <input type="text" id='email' value={email}
@@ -170,7 +196,7 @@ function TaskList(props) {
                           selectedItems={props.selectedItems} setSelectedItems={props.setSelectedItems}
                           priority={item.priority} listId={props.listId}
                           user={props.user} editors={props.editors}
-                          verified={props.verified}/>)
+                          verified={props.verified} owner={props.owner}/>)
                 : props.listItems && props.listItems.map((item) => <Item id={item.id} key={item.id} checked={item.checked} text={item.text}
                                                       handleToggleItemSelect={handleToggleItemSelect}
                                                       listItems={props.listItems} selectedItems={props.selectedItems}
@@ -178,7 +204,7 @@ function TaskList(props) {
                                                       priority={item.priority}
                                                       listId={props.listId}
                                                       user={props.user} editors={props.editors}
-                                                      verified={props.verified}/>)}
+                                                      verified={props.verified} owner={props.owner}/>)}
             {!props.addingItem && props.areYouSure && <button type={"button"} id="item_button" name="item_button"
                                                               onClick={() => props.setAddingItem(true)}>Create New Item
                 +</button>}
@@ -191,26 +217,26 @@ function Item(props) {
     return (<span>
             <input aria-label={(props.name)} type="checkbox" id={props.id} name={props.name} value={props.value} checked={props.checked}
                    className="bigCheckbox" aria-checked={props.checked}
-                   onChange={() => props.handleToggleItemSelect(props.checked, props.selectedItems, props.setSelectedItems, props.id, props.listId, props.editors.includes(props.user.email) && props.verified)}/>
+                   onChange={() => props.handleToggleItemSelect(props.checked, props.selectedItems, props.setSelectedItems, props.id, props.listId, props.editors.includes(props.user.email), props.verified, props.owner)}/>
             <span className={'item_text'}> {!props.checked ?
-                <input className={"item_text"} onChange={e => handleRenaming(e, props.id, props.listId, props.editors.includes(props.user.email) && props.verified)}
+                <input className={"item_text"} onChange={e => handleRenaming(e, props.id, props.listId, props.editors.includes(props.user.email), props.verified, props.owner)}
                        defaultValue={props.text}
-                       key={props.id} id={props.id} readOnly={!(props.editors.includes(props.user.email) && props.verified)}/>
+                       key={props.id} id={props.id} readOnly={!(props.owner || (props.editors.includes(props.user.email) && props.verified))}/>
                 : <input className={"item_text_done"} aria-disabled={"true"} disabled="disabled" defaultValue={props.text} key={props.id} id={props.id}
                          readOnly={true}/>} </span>
-            <button aria-label={(props.priority === 1) ? "low-priority, current priority" : "low-priority"} onClick={() => handlePriorityClick(1, props.id, props.priority, props.listId, props.editors.includes(props.user.email) && props.verified)} value={1}
+            <button aria-label={(props.priority === 1) ? "low-priority, current priority" : "low-priority"} onClick={() => handlePriorityClick(1, props.id, props.priority, props.listId, props.editors.includes(props.user.email), props.verified, props.owner)} value={1}
                   className={1 > props.priority ? "unchecked" : "checked"} aria-pressed={(1 === props.priority) ? "true" : "false"}>!    </button>
-            <button aria-label={(props.priority === 2) ? "medium-priority, current priority" : "medium-priority"} onClick={() => handlePriorityClick(2, props.id, props.priority, props.listId, props.editors.includes(props.user.email) && props.verified)} value={2}
+            <button aria-label={(props.priority === 2) ? "medium-priority, current priority" : "medium-priority"} onClick={() => handlePriorityClick(2, props.id, props.priority, props.listId, props.editors.includes(props.user.email), props.verified, props.owner)} value={2}
                   className={2 > props.priority ? "unchecked" : "checked"} aria-pressed={(2 === props.priority) ? "true" : "false"}   >!   </button>
-            <button aria-label={(props.priority === 3) ? "high-priority, current priority" : "high-priority"} onClick={() => handlePriorityClick(3, props.id, props.priority, props.listId,  props.editors.includes(props.user.email) && props.verified)} value={3}
+            <button aria-label={(props.priority === 3) ? "high-priority, current priority" : "high-priority"} onClick={() => handlePriorityClick(3, props.id, props.priority, props.listId,  props.editors.includes(props.user.email), props.verified, props.owner)} value={3}
                   className={3 > props.priority ? "unchecked" : "checked"} aria-pressed={(3 === props.priority) ? "true" : "false"}   >!   </button>
             <br/><br/>
             </span>
     );
 }
 
-function handlePriorityClick(value, id, priority, listId, allowed) {
-    if(allowed){
+function handlePriorityClick(value, id, priority, listId, allowed, verified, owner) {
+    if((allowed && verified) || owner){
         if (value === priority) {
             setDoc(doc(db, collectionName, listId, listName, id),
                 {"priority": value - 1}, {merge: true}).then(() => console.log("Set new priority"))
@@ -219,22 +245,29 @@ function handlePriorityClick(value, id, priority, listId, allowed) {
                 {"priority": value}, {merge: true}).then(() => console.log("Set new priority"))
         }
     } else {
-        console.log("You are not allowed to edit priorities.")
+        if (allowed && !verified){
+            alert("You need to verify your email before editing.")
+        } else {
+            alert("You are not allowed to edit priorities.")
+        }
     }
-
 }
 
-function handleRenaming(e, id, listId, allowed) {
-    if(allowed){
+function handleRenaming(e, id, listId, allowed, verified, owner) {
+    if((allowed && verified) || owner){
         setDoc(doc(db, collectionName, listId, listName, id),
             {"text": e.target.value}, {merge: true}).then(() => console.log("Set new name"))
     } else {
-        console.log("You are not allowed to edit this item.")
+        if (allowed && !verified){
+            alert("You need to verify your email before editing.")
+        } else {
+            alert("You are not allowed to edit this item.")
+        }
     }
 }
 
-function handleToggleItemSelect(checked, selectedItems, setSelectedItems, itemId, listId, allowed) {
-    if(allowed){
+function handleToggleItemSelect(checked, selectedItems, setSelectedItems, itemId, listId, allowed, verified, owner) {
+    if((allowed && verified) || owner){
         setDoc(doc(db, collectionName, listId, listName, itemId),
             {"checked": !checked}, {merge: true}).then(() => console.log("Toggled item"))
 
@@ -244,7 +277,11 @@ function handleToggleItemSelect(checked, selectedItems, setSelectedItems, itemId
             setSelectedItems([...selectedItems, itemId]);
         }
     } else {
-        console.log("You are not allowed to select items.")
+        if (!verified && allowed){
+            alert("You need to verify your email before editing.")
+        } else {
+            alert("You are not allowed to select items.")
+        }
     }
 }
 
@@ -275,7 +312,7 @@ function SignedInApp(props) {
     }
 
     function verifyEmail() {
-        sendEmailVerification(props.user).then(() => console.log("Sent verification email."));
+        sendEmailVerification(props.user).then(() => alert("Sent verification email."));
     }
 
     if (masterListItems && !masterListItems[0] && count===0){
@@ -354,7 +391,13 @@ function SignedInApp(props) {
             setCurText("")
             setAddingItem(false)
         } else {
-            console.log("You are not allowed to create new items.")
+            if (curList.editors.includes(user.email)){
+                alert("You need to verify your email before editing.")
+            } else {
+                alert("You are not allowed to change this user's permissions.")
+            }
+
+            alert("You are not allowed to create new items.")
         }
     }
 
@@ -365,7 +408,13 @@ function SignedInApp(props) {
             setSelectedItems([]);
             setAreYouSure(true);
         } else {
-            console.log("You are not allowed to delete items.")
+            if (curList.editors.includes(user.email)){
+                alert("You need to verify your email before editing.")
+            } else {
+                alert("You are not allowed to change this user's permissions.")
+            }
+
+            alert("You are not allowed to delete items.")
         }
     }
 
@@ -385,7 +434,13 @@ function SignedInApp(props) {
                 {"title": e.target.value}, {merge: true}).then(() => console.log("Set new name"))
             setCurList({...curList, "title": e.target.value});
         } else {
-            console.log("You are not allowed to change the title name.")
+            if (curList.editors.includes(user.email)){
+                alert("You need to verify your email before editing.")
+            } else {
+                alert("You are not allowed to change this user's permissions.")
+            }
+
+            alert("You are not allowed to change the title name.")
         }
     }
 
@@ -439,7 +494,13 @@ function SignedInApp(props) {
             setReadyDeleteList(true)
             setCurList(masterListItems[0])
         } else {
-            console.log("You are not allowed to delete this list. You may need to verify your email first.")
+            if (curList.editors.includes(user.email)){
+                alert("You need to verify your email before editing.")
+            } else {
+                alert("You are not allowed to change this user's permissions.")
+            }
+
+            alert("You are not allowed to delete this list. You may need to verify your email first.")
         }
     }
 
@@ -465,19 +526,26 @@ function SignedInApp(props) {
             setCurList({...curList, "users": userList, "viewers": viewList, "editors": editList});
             setShareEmail("")
         } else {
-            console.log("You are not allowed to share this list with others. You may need to verify your email first.")
+            if (curList.editors.includes(user.email)){
+                alert("You need to verify your email before editing.")
+            } else {
+                alert("You are not allowed to change this user's permissions.")
+            }
+
+            alert("You are not allowed to share this list with others. You may need to verify your email first.")
         }
     }
 
     function handleChangeSharedUserPerms(e) {
         if(user.uid === curList.owner) {
-            const updatedUserList = curList.users.map((curUser) => curUser === sharedUser ? {...curUser, "perms": e.target.value} : curUser)
+            const updatedUserList = curList.users.map((curUser) => curUser.email === sharedUser.email ? {...curUser, "perms": e.target.value} : curUser)
 
             let updatedEditList = curList.editors
+
             if(e.target.value === "View"){
-                updatedEditList = curList.viewers.filter((curUser) => curUser !== sharedUser)
+                updatedEditList = curList.editors.filter((curUser) => curUser !== sharedUser.email)
             } else {
-                updatedEditList.push(shareEmail)
+                updatedEditList.push(sharedUser.email)
             }
 
             setDoc(doc(db, collectionName, curList.id),
@@ -485,7 +553,11 @@ function SignedInApp(props) {
             setCurList({...curList, "users": updatedUserList, "editors": updatedEditList})
             setSharedUserPerms(e.target.value)
         } else {
-            console.log("You are not allowed to change this user's permissions.")
+            if (curList.editors.includes(user.email)){
+                alert("You need to verify your email before editing.")
+            } else {
+                alert("You are not allowed to change this user's permissions.")
+            }
         }
     }
 
@@ -499,7 +571,7 @@ function SignedInApp(props) {
 
     function handleDeletePerson() {
         // Though about adding  || sharedUser.email === user.email so users can unshare themselves.
-        if(user.uid === curList.owner) {
+        if(user.uid === curList.owner || (curList.editors.includes(user.email) && user.emailVerified)){
             const updatedUserList = curList.users.filter((curUser) => curUser !== sharedUser)
             const updatedViewerList = curList.viewers.filter((curUser) => curUser !== sharedUser)
             const updatedEditList = curList.editors.filter((curUser) => curUser !== sharedUser)
@@ -509,7 +581,11 @@ function SignedInApp(props) {
             setSharedUser(updatedUserList[0])
             setSharedUserPerms(updatedUserList[0].perms)
         } else {
-            console.log("You are not allowed to unshare this user.")
+            if (curList.editors.includes(user.email)){
+                alert("You need to verify your email before editing.")
+            } else {
+                alert("You are not allowed to unshare this user.")
+            }
         }
     }
 
@@ -585,7 +661,8 @@ function SignedInApp(props) {
                                       selectedItems={selectedItems} setSelectedItems={setSelectedItems}
                                       listId={curList ? curList.id : masterListItems && masterListItems[0] ? masterListItems[0].id : "1"}
                                       user={user} editors={curList ? curList.editors : []}
-                                      verified={(curList ? user.uid === curList.owner : false ) || user.emailVerified}/>}
+                                      verified={user.emailVerified}
+                                      owner={curList ? curList.owner === user.uid : false}/>}
             {addingItem && <span className={"item_enter"}>
         <label htmlFor="item_enter"> Enter new item text:</label>
         <br/>

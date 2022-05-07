@@ -169,14 +169,16 @@ function TaskList(props) {
                           handleToggleItemSelect={handleToggleItemSelect} listItems={props.listItems}
                           selectedItems={props.selectedItems} setSelectedItems={props.setSelectedItems}
                           priority={item.priority} listId={props.listId}
-                          user={props.user} editors={props.editors}/>)
+                          user={props.user} editors={props.editors}
+                          verified={props.verified}/>)
                 : props.listItems && props.listItems.map((item) => <Item id={item.id} key={item.id} checked={item.checked} text={item.text}
                                                       handleToggleItemSelect={handleToggleItemSelect}
                                                       listItems={props.listItems} selectedItems={props.selectedItems}
                                                       setSelectedItems={props.setSelectedItems}
                                                       priority={item.priority}
                                                       listId={props.listId}
-                                                       user={props.user} editors={props.editors}/>)}
+                                                      user={props.user} editors={props.editors}
+                                                      verified={props.verified}/>)}
             {!props.addingItem && props.areYouSure && <button type={"button"} id="item_button" name="item_button"
                                                               onClick={() => props.setAddingItem(true)}>Create New Item
                 +</button>}
@@ -189,18 +191,18 @@ function Item(props) {
     return (<span>
             <input aria-label={(props.name)} type="checkbox" id={props.id} name={props.name} value={props.value} checked={props.checked}
                    className="bigCheckbox" aria-checked={props.checked}
-                   onChange={() => props.handleToggleItemSelect(props.checked, props.selectedItems, props.setSelectedItems, props.id, props.listId, props.user.email in props.editors)}/>
+                   onChange={() => props.handleToggleItemSelect(props.checked, props.selectedItems, props.setSelectedItems, props.id, props.listId, props.editors.includes(props.user.email) && props.verified)}/>
             <span className={'item_text'}> {!props.checked ?
-                <input className={"item_text"} onChange={e => handleRenaming(e, props.id, props.listId, props.user.email in props.editors)}
+                <input className={"item_text"} onChange={e => handleRenaming(e, props.id, props.listId, props.editors.includes(props.user.email) && props.verified)}
                        defaultValue={props.text}
-                       key={props.id} id={props.id}/>
+                       key={props.id} id={props.id} readOnly={!(props.editors.includes(props.user.email) && props.verified)}/>
                 : <input className={"item_text_done"} aria-disabled={"true"} disabled="disabled" defaultValue={props.text} key={props.id} id={props.id}
                          readOnly={true}/>} </span>
-            <button aria-label={(props.priority === 1) ? "low-priority, current priority" : "low-priority"} onClick={() => handlePriorityClick(1, props.id, props.priority, props.listId, props.user.email in props.editors)} value={1}
+            <button aria-label={(props.priority === 1) ? "low-priority, current priority" : "low-priority"} onClick={() => handlePriorityClick(1, props.id, props.priority, props.listId, props.editors.includes(props.user.email) && props.verified)} value={1}
                   className={1 > props.priority ? "unchecked" : "checked"} aria-pressed={(1 === props.priority) ? "true" : "false"}>!    </button>
-            <button aria-label={(props.priority === 2) ? "medium-priority, current priority" : "medium-priority"} onClick={() => handlePriorityClick(2, props.id, props.priority, props.listId, props.user.email in props.editors)} value={2}
+            <button aria-label={(props.priority === 2) ? "medium-priority, current priority" : "medium-priority"} onClick={() => handlePriorityClick(2, props.id, props.priority, props.listId, props.editors.includes(props.user.email) && props.verified)} value={2}
                   className={2 > props.priority ? "unchecked" : "checked"} aria-pressed={(2 === props.priority) ? "true" : "false"}   >!   </button>
-            <button aria-label={(props.priority === 3) ? "high-priority, current priority" : "high-priority"} onClick={() => handlePriorityClick(3, props.id, props.priority, props.listId, props.user.email in props.editors)} value={3}
+            <button aria-label={(props.priority === 3) ? "high-priority, current priority" : "high-priority"} onClick={() => handlePriorityClick(3, props.id, props.priority, props.listId,  props.editors.includes(props.user.email) && props.verified)} value={3}
                   className={3 > props.priority ? "unchecked" : "checked"} aria-pressed={(3 === props.priority) ? "true" : "false"}   >!   </button>
             <br/><br/>
             </span>
@@ -226,6 +228,8 @@ function handleRenaming(e, id, listId, allowed) {
     if(allowed){
         setDoc(doc(db, collectionName, listId, listName, id),
             {"text": e.target.value}, {merge: true}).then(() => console.log("Set new name"))
+    } else {
+        console.log("You are not allowed to edit this item.")
     }
 }
 
@@ -239,6 +243,8 @@ function handleToggleItemSelect(checked, selectedItems, setSelectedItems, itemId
         } else {
             setSelectedItems([...selectedItems, itemId]);
         }
+    } else {
+        console.log("You are not allowed to select items.")
     }
 }
 
@@ -257,6 +263,7 @@ function SignedInApp(props) {
 
     const [showAlert, setShowAlert] = useState(false);
 
+    const [count, setCount] = useState(0);
     const user = props.user;
 
     function handleAlertOK() {
@@ -271,13 +278,28 @@ function SignedInApp(props) {
         sendEmailVerification(props.user).then(() => console.log("Sent verification email."));
     }
 
-    if (masterListItems && !curList) {
+    if (masterListItems && !masterListItems[0] && count===0){
+        const uniqueId = generateUniqueID()
+        // noinspection JSCheckFunctionSignatures
+        setDoc(doc(db, collectionName, uniqueId),
+            {
+                "id": uniqueId,
+                "title": "Your TODO List",
+                "owner": user.uid,
+                "users": [{"email": user.email, "perms": "Edit"}],
+                "viewers": [user.email],
+                "editors": [user.email]
+            }).then(() => console.log("Added new list"));
+        setCount(1)
+    }
+
+    if (masterListItems && masterListItems[0] && !curList) {
         setCurList(masterListItems[0]);
     }
 
     const q = reverse ?
-        query(collection(db, collectionName, masterLoadingPage ? "1" : (curList ? curList.id : (masterListItems ? masterListItems[0].id : "1")), listName), orderBy(filterType.slice(0, filterType.length - 3), "desc"))
-        : query(collection(db, collectionName, masterLoadingPage ? "1" : (curList ? curList.id : (masterListItems ? masterListItems[0].id : "1")), listName), orderBy(filterType.slice(0, filterType.length - 3), "asc"));
+        query(collection(db, collectionName, masterLoadingPage ? "1" : (curList ? curList.id : (masterListItems && masterListItems[0] ? masterListItems[0].id : "1")), listName), orderBy(filterType.slice(0, filterType.length - 3), "desc"))
+        : query(collection(db, collectionName, masterLoadingPage ? "1" : (curList ? curList.id : (masterListItems && masterListItems[0] ? masterListItems[0].id : "1")), listName), orderBy(filterType.slice(0, filterType.length - 3), "asc"));
 
     const [listItems, loadingPage,] = useCollectionData(q);
 
@@ -316,7 +338,9 @@ function SignedInApp(props) {
 
 
     function handleNewItem() {
-        if(curList.editors.contains(user.email)){
+        let curEditors = curList.editors
+
+        if(curEditors.includes(user.email) && (user.emailVerified || user.uid === curList.owner)){
             const uniqueId = generateUniqueID()
             setDoc(doc(db, collectionName, curList ? curList.id : masterListItems[0].id, listName, uniqueId),
                 {
@@ -335,7 +359,7 @@ function SignedInApp(props) {
     }
 
     function handleDeleteClick() {
-        if(curList.editors.contains(user.email)) {
+        if(curList.editors.includes(user.email) && (user.emailVerified || user.uid === curList.owner)) {
             // noinspection JSCheckFunctionSignatures
             selectedItems.forEach(id => deleteDoc(doc(db, collectionName, curList.id, listName, id)));
             setSelectedItems([]);
@@ -356,7 +380,7 @@ function SignedInApp(props) {
 
     function handleTitleChange(e, listId) {
         let curEditors = curList.editors
-        if(curEditors.includes(user.email)) {
+        if(curEditors.includes(user.email) && (user.emailVerified || user.uid === curList.owner)) {
             setDoc(doc(db, collectionName, listId),
                 {"title": e.target.value}, {merge: true}).then(() => console.log("Set new name"))
             setCurList({...curList, "title": e.target.value});
@@ -415,12 +439,12 @@ function SignedInApp(props) {
             setReadyDeleteList(true)
             setCurList(masterListItems[0])
         } else {
-            console.log("You are not allowed to delete this list.")
+            console.log("You are not allowed to delete this list. You may need to verify your email first.")
         }
     }
 
     function handleShareEmail(){
-        if(curList.editors.contains(user.email)) {
+        if(curList.editors.includes(user.email) && (user.emailVerified || user.uid === curList.owner) ){
             if(shareEmail === ""){
                 return
             }
@@ -441,7 +465,7 @@ function SignedInApp(props) {
             setCurList({...curList, "users": userList, "viewers": viewList, "editors": editList});
             setShareEmail("")
         } else {
-            console.log("You are not allowed to share this list with others.")
+            console.log("You are not allowed to share this list with others. You may need to verify your email first.")
         }
     }
 
@@ -474,8 +498,8 @@ function SignedInApp(props) {
     }
 
     function handleDeletePerson() {
-
-        if(user.uid === curList.owner || sharedUser.email === user.email) {
+        // Though about adding  || sharedUser.email === user.email so users can unshare themselves.
+        if(user.uid === curList.owner) {
             const updatedUserList = curList.users.filter((curUser) => curUser !== sharedUser)
             const updatedViewerList = curList.viewers.filter((curUser) => curUser !== sharedUser)
             const updatedEditList = curList.editors.filter((curUser) => curUser !== sharedUser)
@@ -559,8 +583,9 @@ function SignedInApp(props) {
             {!addingItem && <TaskList hideCompleted={hideCompleted} listItems={listItems} addingItem={addingItem}
                                       areYouSure={areYouSure} setAddingItem={setAddingItem}
                                       selectedItems={selectedItems} setSelectedItems={setSelectedItems}
-                                      listId={curList ? curList.id : masterListItems ? masterListItems[0].id : "1"}
-                                      user={user} editors={curList ? curList.editors : []}/>}
+                                      listId={curList ? curList.id : masterListItems && masterListItems[0] ? masterListItems[0].id : "1"}
+                                      user={user} editors={curList ? curList.editors : []}
+                                      verified={(curList ? user.uid === curList.owner : false ) || user.emailVerified}/>}
             {addingItem && <span className={"item_enter"}>
         <label htmlFor="item_enter"> Enter new item text:</label>
         <br/>
